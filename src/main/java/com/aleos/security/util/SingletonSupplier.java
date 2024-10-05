@@ -1,6 +1,5 @@
 package com.aleos.security.util;
 
-import io.micrometer.common.lang.Nullable;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -8,10 +7,8 @@ import java.util.function.Supplier;
 
 public class SingletonSupplier<T> implements Supplier<T> {
 
-    @Nullable
     private final Supplier<? extends T> instanceSupplier;
 
-    @Nullable
     private volatile T singletonInstance;
 
     private final Lock writeLock = new ReentrantLock();
@@ -21,7 +18,6 @@ public class SingletonSupplier<T> implements Supplier<T> {
     }
 
     @Override
-    @Nullable
     public T get() {
         T instance = this.singletonInstance;
         if (instance == null) {
