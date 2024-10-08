@@ -1,4 +1,4 @@
-package com.aleos.annotation;
+package com.aleos.context.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

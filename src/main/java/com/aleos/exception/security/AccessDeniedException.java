@@ -1,4 +1,4 @@
-package com.aleos.exception;
+package com.aleos.exception.security;
 
 public class AccessDeniedException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.aleos.exception;
+package com.aleos.exception.context;
 
 public class AuthenticationException extends RuntimeException {
 

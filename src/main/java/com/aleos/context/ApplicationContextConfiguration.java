@@ -1,7 +1,7 @@
 package com.aleos.context;
 
 
-import com.aleos.annotation.Bean;
+import com.aleos.context.annotation.Bean;
 import com.aleos.http.SessionManager;
 import com.aleos.repository.UserRepository;
 import com.aleos.security.authorization.AuthorizationManager;
@@ -11,7 +11,6 @@ import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContextRepository;
 import com.aleos.service.AuthenticationService;
 import com.aleos.service.BaseAuthenticationService;
-import com.aleos.util.Properties;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;

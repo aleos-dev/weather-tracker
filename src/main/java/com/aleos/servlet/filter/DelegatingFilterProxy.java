@@ -1,8 +1,8 @@
 package com.aleos.servlet.filter;
 
 import com.aleos.security.web.SecurityFilterChain;
-import com.aleos.servicelocator.BeanFactory;
-import com.aleos.servicelocator.ServiceLocator;
+import com.aleos.context.servicelocator.BeanFactory;
+import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;

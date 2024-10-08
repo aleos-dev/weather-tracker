@@ -7,7 +7,7 @@ import com.aleos.security.web.SecurityFilterChain;
 import com.aleos.security.web.context.SecurityContextRepository;
 import com.aleos.security.web.filters.*;
 import com.aleos.service.AuthenticationService;
-import com.aleos.servicelocator.ServiceLocator;
+import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.servlet.Filter;
 
 import java.util.HashMap;
