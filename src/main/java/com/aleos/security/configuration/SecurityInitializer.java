@@ -1,5 +1,6 @@
 package com.aleos.security.configuration;
 
+import com.aleos.context.Properties;
 import com.aleos.security.authorization.AuthorizationManager;
 import com.aleos.security.core.Role;
 import com.aleos.security.web.DefaultSecurityFilterChain;
@@ -25,8 +26,13 @@ public final class SecurityInitializer {
 
         applyAuthorizationRules(locator);
 
+        boolean encodingEnabled = Properties.get("security.http.utf8.encoding.enabled")
+                .map(Boolean::parseBoolean)
+                .orElse(false);
+
         DefaultSecurityFilterChain defaultSecurityFilterChain = configurer
                 .setPattern("/")
+                .addFilter(createCharacterEncodingFilter(), encodingEnabled)
                 .addFilter(createSecurityContextHolderFilter(locator))
                 .addFilter(createAuthenticationFilterImpl(locator))
                 .addFilter(createAnonymousAuthenticationFilter())
@@ -34,6 +40,26 @@ public final class SecurityInitializer {
                 .build();
 
         locator.registerBean(SecurityFilterChain.class, defaultSecurityFilterChain);
+    }
+
+    private static Filter createCharacterEncodingFilter() {
+        return new CharacterEncodingFilter();
+    }
+
+    private static SecurityContextHolderFilter createSecurityContextHolderFilter(ServiceLocator locator) {
+        return new SecurityContextHolderFilter(locator.getBean(SecurityContextRepository.class));
+    }
+
+    private static Filter createAuthenticationFilterImpl(ServiceLocator locator) {
+        return new AuthenticationFilter(locator.getBean(AuthenticationService.class));
+    }
+
+    private static Filter createAnonymousAuthenticationFilter() {
+        return new AnonymousAuthenticationFilter();
+    }
+
+    private static Filter createAuthorizationFilter(ServiceLocator locator) {
+        return new AuthorizationFilter(locator.getBean(AuthorizationManager.class));
     }
 
     private static void applyAuthorizationRules(ServiceLocator locator) {
@@ -44,21 +70,5 @@ public final class SecurityInitializer {
 
         var authorizationManager = locator.getBean(AuthorizationManager.class);
         authorizationManager.addRules(authorizationRules);
-    }
-
-    private static Filter createAuthorizationFilter(ServiceLocator locator) {
-        return new AuthorizationFilter(locator.getBean(AuthorizationManager.class));
-    }
-
-    private static Filter createAuthenticationFilterImpl(ServiceLocator locator) {
-        return new AuthenticationFilter(locator.getBean(AuthenticationService.class));
-    }
-
-    private static SecurityContextHolderFilter createSecurityContextHolderFilter(ServiceLocator locator) {
-        return new SecurityContextHolderFilter(locator.getBean(SecurityContextRepository.class));
-    }
-
-    private static Filter createAnonymousAuthenticationFilter() {
-        return new AnonymousAuthenticationFilter();
     }
 }

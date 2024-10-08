@@ -13,7 +13,18 @@ public class SecurityFilterChainConfigurer {
     private final List<Filter> filters = new ArrayList<>();
 
     public SecurityFilterChainConfigurer addFilter(Filter filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("Filter cannot be null");
+        }
         this.filters.add(filter);
+        return this;
+    }
+
+    public SecurityFilterChainConfigurer addFilter(Filter filter, boolean isEnabled) {
+        if (isEnabled) {
+            return addFilter(filter);
+        }
+
         return this;
     }
 
