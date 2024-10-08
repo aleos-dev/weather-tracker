@@ -1,6 +1,7 @@
 package com.aleos.servlet.filter;
 
-import com.aleos.security.web.SecurityFilterChain;
+import com.aleos.http.CustomHttpSession;
+import com.aleos.http.SessionManager;
 import com.aleos.context.servicelocator.BeanFactory;
 import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.servlet.FilterChain;
@@ -12,22 +13,23 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-public class DelegatingFilterProxy extends HttpFilter {
+public class SessionFilter extends HttpFilter {
 
-    private transient SecurityFilterChain delegateFilter;
+    private transient SessionManager manager;
 
     @Override
     public void init(FilterConfig config) {
         var locator = (ServiceLocator) config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
-        delegateFilter = locator.getBean(SecurityFilterChain.class);
+        manager = (SessionManager) locator.getBean(CustomHttpSession.class);
     }
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        if (delegateFilter != null && delegateFilter.matches(req)) {
-            delegateFilter.apply(req, res, chain);
-        } else {
-            chain.doFilter(req, res);
-        }
+        CustomHttpSession session = manager.getValidSession(req, res)
+                .orElse(manager.createSession(res));
+
+        req.setAttribute(CustomHttpSession.SESSION_CONTEXT_KEY, session);
+
+        chain.doFilter(req, res);
     }
 }

@@ -1,8 +1,8 @@
-package com.aleos.listener;
+package com.aleos.context.listener;
 
 import com.aleos.security.configuration.SecurityInitializer;
-import com.aleos.servicelocator.BeanFactory;
-import com.aleos.servicelocator.ServiceLocator;
+import com.aleos.context.servicelocator.BeanFactory;
+import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 

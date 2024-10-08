@@ -82,26 +82,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.34</version>
         </dependency>
-        <!-- Spring Security Core -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-            <version>6.2.4</version> <!-- Use the latest stable version -->
-        </dependency>
-
-        <!-- Spring Security Web (for handling web security) -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-web</artifactId>
-            <version>6.2.4</version>
-        </dependency>
-
-        <!-- Spring Security Config (if you need configuration support) -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-config</artifactId>
-            <version>6.2.4</version>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.tomcat</groupId>

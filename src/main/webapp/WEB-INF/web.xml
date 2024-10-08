@@ -1,0 +1,36 @@
+<!DOCTYPE web-app PUBLIC
+        "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+        "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+    <display-name>Archetype Created Web Application</display-name>
+
+    <filter>
+        <filter-name>sessionFilter</filter-name>
+        <filter-class>com.aleos.servlet.filter.SessionFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>securityFilter</filter-name>
+        <filter-class>com.aleos.servlet.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>sessionFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>securityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>com.aleos.context.listener.TemplateEngineInitializer</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.aleos.context.listener.ApplicationContextInitializer</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.aleos.context.listener.SecurityFilterInitializer</listener-class>
+    </listener>
+
+</web-app>

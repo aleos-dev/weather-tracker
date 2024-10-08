@@ -1,4 +1,4 @@
-package com.aleos.servicelocator;
+package com.aleos.context.servicelocator;
 
 public interface ServiceLocator {
 
