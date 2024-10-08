@@ -1,6 +1,6 @@
-package com.aleos.listener;
+package com.aleos.context.listener;
 
-import com.aleos.util.Properties;
+import com.aleos.context.Properties;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import org.thymeleaf.TemplateEngine;

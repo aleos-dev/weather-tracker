@@ -1,6 +1,6 @@
 package com.aleos.service;
 
-import com.aleos.exception.AuthenticationException;
+import com.aleos.exception.context.AuthenticationException;
 import com.aleos.repository.UserRepository;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.core.AuthenticationToken;

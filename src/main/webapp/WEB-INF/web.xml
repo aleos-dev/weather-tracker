@@ -24,13 +24,13 @@
     </filter-mapping>
 
     <listener>
-        <listener-class>com.aleos.listener.TemplateEngineInitializer</listener-class>
+        <listener-class>com.aleos.context.listener.TemplateEngineInitializer</listener-class>
     </listener>
     <listener>
-        <listener-class>com.aleos.listener.ApplicationContextInitializer</listener-class>
+        <listener-class>com.aleos.context.listener.ApplicationContextInitializer</listener-class>
     </listener>
     <listener>
-        <listener-class>com.aleos.listener.SecurityFilterInitializer</listener-class>
+        <listener-class>com.aleos.context.listener.SecurityFilterInitializer</listener-class>
     </listener>
 
 </web-app>

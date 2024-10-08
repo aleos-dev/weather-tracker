@@ -1,6 +1,6 @@
 package com.aleos.http;
 
-import com.aleos.util.Properties;
+import com.aleos.context.Properties;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

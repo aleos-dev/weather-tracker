@@ -1,6 +1,6 @@
 package com.aleos.security.web.filters;
 
-import com.aleos.exception.AccessDeniedException;
+import com.aleos.exception.security.AccessDeniedException;
 import com.aleos.security.authorization.AuthorizationManager;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.web.context.SecurityContextHolder;

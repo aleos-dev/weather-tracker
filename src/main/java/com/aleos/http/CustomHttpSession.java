@@ -20,5 +20,4 @@ public interface CustomHttpSession {
         void removeAttribute(String name);
 
         void invalidate();
-
 }
