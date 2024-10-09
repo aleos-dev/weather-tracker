@@ -4,11 +4,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/api/v1/welcome")
-public class WelcomeServlet extends AbstractThymeleafServlet {
+@WebServlet("/api/v1/weather")
+public class WeatherServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        processTemplate("welcome", req, res);
+        processTemplate("weather", req, res);
     }
 }
