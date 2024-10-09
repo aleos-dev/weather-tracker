@@ -16,8 +16,7 @@ import java.util.function.Supplier;
 @AllArgsConstructor
 public class SecurityContextHolderFilter extends HttpFilter {
 
-    private final SecurityContextRepository securityContextRepository;
-
+    private final transient SecurityContextRepository securityContextRepository;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
