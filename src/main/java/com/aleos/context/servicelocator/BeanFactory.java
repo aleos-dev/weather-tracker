@@ -1,7 +1,7 @@
 package com.aleos.context.servicelocator;
 
 import com.aleos.context.annotation.Bean;
-import com.aleos.exception.security.BeanInitializationException;
+import com.aleos.exception.context.BeanInitializationException;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;

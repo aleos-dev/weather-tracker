@@ -1,4 +1,4 @@
-package com.aleos.exception.security;
+package com.aleos.exception.context;
 
 public class BeanInitializationException extends RuntimeException {
 
