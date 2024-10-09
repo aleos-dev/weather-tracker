@@ -1,6 +1,8 @@
 package com.aleos.security.core;
 
 
+import com.aleos.security.web.filters.AnonymousAuthenticationFilter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,7 +21,7 @@ public class AuthenticationToken implements Authentication {
         this.principal = principal;
         this.credential = credential;
         this.authorities = Arrays.asList(authorities);
-        authenticated = true;
+            authenticated = true;
     }
 
     @Override
@@ -45,5 +47,15 @@ public class AuthenticationToken implements Authentication {
     @Override
     public void isAuthenticated(boolean isAuthenticated) {
         this.authenticated = isAuthenticated;
+    }
+
+    @Override
+    public boolean isAnonymous() {
+        return principal.equals(AnonymousAuthenticationFilter.ANONYMOUS_USER);
+    }
+
+    @Override
+    public String toString() {
+        return "AuthenticationToken [principal=" + principal + ", authorities=" + authorities + ", authenticated=" + authenticated + "]";
     }
 }
