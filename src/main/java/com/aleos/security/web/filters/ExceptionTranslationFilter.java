@@ -3,6 +3,7 @@ package com.aleos.security.web.filters;
 import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
 import com.aleos.exception.security.AccessDeniedException;
+import com.aleos.security.web.context.SecurityContextHolder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
@@ -24,12 +25,18 @@ public class ExceptionTranslationFilter extends HttpFilter {
             chain.doFilter(req, res);
 
         } catch (AuthenticationException e) {
-            logger.debug(e.getMessage());
+            logger.debug("Redirecting to login page... {}", REDIRECT_URL_KEY);
             res.sendRedirect(REDIRECT_URL_KEY);
 
         } catch (AccessDeniedException e) {
-            logger.debug(e.getMessage());
-            res.sendError(403, "Access Denied");
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                logger.debug("User not have access to resource");
+                res.sendError(403, "Access Denied");
+            } else {
+                logger.debug("Required authentication {}", authentication);
+                res.sendRedirect(REDIRECT_URL_KEY);
+            }
         }
     }
 }
