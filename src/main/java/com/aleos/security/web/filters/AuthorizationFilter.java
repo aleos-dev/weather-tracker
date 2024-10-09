@@ -16,12 +16,12 @@ import java.io.IOException;
 @AllArgsConstructor
 public class AuthorizationFilter extends HttpFilter {
 
-    private final AuthorizationManager authorizationManager;
+    private final transient AuthorizationManager authorizationManager;
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-
-        if(!authorizationManager.check(req, this::getAuthentication)) {
+        boolean isPermitted = authorizationManager.check(req, this::getAuthentication);
+        if (!isPermitted) {
             throw new AccessDeniedException("Access Denied");
         }
 

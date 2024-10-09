@@ -1,34 +1,35 @@
 package com.aleos.http;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class CustomHttpSessionImpl implements CustomHttpSession {
 
-    private final UUID id;
-
     private final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
 
+    @Getter
+    private final UUID id;
+
+    @Getter
     private final long creationTime;
 
+    @Getter
+    @Setter
     private long lastAccessedTime;
+
+    @Getter
+    @Setter
+    private String originalRequest;
 
     public CustomHttpSessionImpl(UUID id) {
         this.id = id;
         creationTime = System.currentTimeMillis();
+        lastAccessedTime = creationTime;
     }
-
-    @Override
-    public long getCreationTime() {
-        return creationTime;
-    }
-
-    @Override
-    public UUID getId() {
-        return id;
-    }
-
     @Override
     public Object getAttribute(String name) {
         return attributes.get(name);
@@ -37,14 +38,6 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     @Override
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
-    }
-
-    public long getLastAccessedTime() {
-        return lastAccessedTime;
-    }
-
-    public void setLastAccessedTime(long lastAccessedTime) {
-        this.lastAccessedTime = lastAccessedTime;
     }
 
     @Override

@@ -17,6 +17,9 @@ public interface CustomHttpSession {
         long getLastAccessedTime();
         void setLastAccessedTime(long lastAccessedTime);
 
+        String getOriginalRequest();
+        void setOriginalRequest(String originalRequest);
+
         void removeAttribute(String name);
 
         void invalidate();
