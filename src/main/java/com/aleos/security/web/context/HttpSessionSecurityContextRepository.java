@@ -35,9 +35,9 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
     public void saveContext(SecurityContext context, HttpServletRequest req) {
         logger.debug("Starting to save security context to request.");
 
-        CustomHttpSession customHttpSession = readCustomHttpSession(req);
-        if (customHttpSession != null) {
-            customHttpSession.setAttribute(SECURITY_CONTEXT_KEY, context);
+        CustomHttpSession session = readCustomHttpSession(req);
+        if (session != null) {
+            session.setAttribute(SECURITY_CONTEXT_KEY, context);
             logger.debug("Security context saved in session.");
         } else {
             logger.debug("No session found, cannot save security context.");
