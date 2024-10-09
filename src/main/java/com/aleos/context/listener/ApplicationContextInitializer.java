@@ -7,9 +7,13 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.annotation.WebListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @WebListener
 public class ApplicationContextInitializer implements ServletContextListener {
+
+    public static final Logger logger = LoggerFactory.getLogger(ApplicationContextInitializer.class);
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -18,8 +22,12 @@ public class ApplicationContextInitializer implements ServletContextListener {
 
 
     private void injectFactoryBean(ServletContextEvent sce) {
-        var factory = new BeanFactory(ApplicationContextConfiguration.class);
-        sce.getServletContext().setAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY, factory);
+        try {
+            var factory = new BeanFactory(ApplicationContextConfiguration.class);
+            sce.getServletContext().setAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY, factory);
+        } catch (Exception e) {
+            logger.error("App failed to start", e);
+        }
     }
 
      @Override
