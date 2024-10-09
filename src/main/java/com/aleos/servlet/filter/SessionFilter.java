@@ -1,9 +1,9 @@
 package com.aleos.servlet.filter;
 
-import com.aleos.http.CustomHttpSession;
-import com.aleos.http.SessionManager;
 import com.aleos.context.servicelocator.BeanFactory;
 import com.aleos.context.servicelocator.ServiceLocator;
+import com.aleos.http.CustomHttpSession;
+import com.aleos.http.SessionManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
@@ -26,7 +26,7 @@ public class SessionFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
         CustomHttpSession session = manager.getValidSession(req, res)
-                .orElse(manager.createSession(res));
+                .orElseGet(() -> manager.createSession(res));
 
         req.setAttribute(CustomHttpSession.SESSION_CONTEXT_KEY, session);
 
