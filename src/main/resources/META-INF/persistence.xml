@@ -5,39 +5,27 @@
              version="3.0">
 
     <persistence-unit name="default">
+          <properties>
+            <!-- JDBC Properties -->
+            <property name="jakarta.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/weather_tracker_db"/>
+            <property name="jakarta.persistence.jdbc.user" value="aleos"/>
+            <property name="jakarta.persistence.jdbc.password" value="aleos_db_password"/>
 
-        <properties>
-            <property name="jakarta.persistence.jdbc.driver" value="org.h2.Driver"/>
-            <property name="jakarta.persistence.jdbc.url"
-                      value="jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;INIT=CREATE SCHEMA IF NOT EXISTS public"/>
-            <property name="jakarta.persistence.jdbc.user" value="sa"/>
-            <property name="jakarta.persistence.jdbc.password" value=""/>
-
-            <!-- Specify HikariCP as the connection provider -->
-            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
-
+            <!-- Hibernate Properties -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
             <property name="hibernate.default_schema" value="public"/>
-
-            <!-- Set the session context class to 'thread' -->
             <property name="hibernate.current_session_context_class" value="thread"/>
-
-            <!-- Additional properties as needed -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
             <property name="hibernate.physical_naming_strategy"
                       value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
-
-            <!--            <property name="hibernate.hbm2ddl.import_files" value="META-INF/script.sql"/>-->
-
-            <!--            <property name="hibernate.show_sql" value="true"/>-->
             <property name="hibernate.format_sql" value="true"/>
             <property name="hibernate.use_sql_comments" value="true"/>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
-
+            <property name="hibernate.generate_statistics" value="true"/>
             <property name="hibernate.session.events.log.LOG_QUERIES_SLOWER_THAN_MS" value="20"/>
 
-            <!-- Enable Hibernate statistics -->
-            <property name="hibernate.generate_statistics" value="true"/>
-
             <!-- HikariCP Configuration -->
+            <property name="hibernate.connection.provider_class" value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
             <property name="hibernate.hikari.connectionTimeout" value="20000"/>
             <property name="hibernate.hikari.maximumPoolSize" value="10"/>
             <property name="hibernate.hikari.minimumIdle" value="1"/>

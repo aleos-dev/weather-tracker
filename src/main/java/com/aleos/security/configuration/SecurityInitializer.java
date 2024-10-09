@@ -44,9 +44,12 @@ public final class SecurityInitializer {
     }
 
     private static void applyAuthorizationRules(ServiceLocator locator) {
+        String baseUrl = Properties.get("base.url").orElse("/");
+
         Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
         authorizationRules.put("/css", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/login", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
+        authorizationRules.put(baseUrl, List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/weather", List.of(Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/", List.of(Role.ADMIN));
 

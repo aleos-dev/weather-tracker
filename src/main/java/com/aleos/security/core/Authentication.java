@@ -13,4 +13,6 @@ public interface Authentication {
     boolean isAuthenticated();
 
     void isAuthenticated(boolean isAuthenticated);
+
+    boolean isAnonymous();
 }

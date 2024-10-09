@@ -1,12 +1,11 @@
 package com.aleos.security.authorization;
 
 import com.aleos.exception.context.AuthenticationException;
-import com.aleos.exception.security.AccessDeniedException;
+import com.aleos.exception.security.ResourceNotFoundException;
 import com.aleos.http.CustomHttpSession;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.core.GrantedAuthority;
 import com.aleos.security.core.Role;
-import com.aleos.security.web.filters.AnonymousAuthenticationFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
 
@@ -22,10 +21,10 @@ public class AuthorizationManager {
     private final Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
 
     public boolean check(HttpServletRequest req, Supplier<Authentication> authentication) {
-        logger.info("Checking authorization for request: {}", req.getRequestURI());
+        var requestURI = req.getRequestURI();
+        logger.info("Checking authorization for request: {}", requestURI);
 
         var auth = getAuthenticatedUser(authentication);
-        var requestURI = req.getRequestURI();
         List<Role> allowedRoles = getAllowedRolesForRequest(requestURI);
 
         boolean isAllowed = auth.getAuthorities().stream()
@@ -54,7 +53,7 @@ public class AuthorizationManager {
             throw new AuthenticationException("Not authenticated");
         }
 
-        logger.info("User {} is authenticated.", auth.getPrincipal());
+        logger.info("{} user is authenticated.", auth.getPrincipal());
         return auth;
     }
 
@@ -65,8 +64,8 @@ public class AuthorizationManager {
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElseThrow(() -> {
-                    logger.warn("Access denied for URI: {}", requestUri);
-                    return new AccessDeniedException("Access denied");
+                    logger.warn("Resource: {} not found", requestUri);
+                    return new ResourceNotFoundException("Resource not found: " + requestUri);
                 });
     }
 
@@ -79,7 +78,7 @@ public class AuthorizationManager {
     }
 
     private boolean isRegistrationRequired(boolean isAllowed, Authentication auth) {
-        boolean registrationRequired = !isAllowed && AnonymousAuthenticationFilter.ANONYMOUS_USER.equals(auth.getPrincipal());
+        boolean registrationRequired = !isAllowed && auth.isAnonymous();
 
         logger.debug("Registration required: {}", registrationRequired);
         return registrationRequired;
