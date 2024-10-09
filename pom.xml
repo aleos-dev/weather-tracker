@@ -8,7 +8,7 @@
 
     <packaging>war</packaging>
     <name>Weather Tracker Maven Webapp</name>
-    <url>https://weather-trackes.ale-os.com</url>
+    <url>https://weather-trackers.ale-os.com</url>
 
     <properties>
         <java.version>21</java.version>
@@ -58,17 +58,21 @@
             <version>8.0.1.Final</version>
         </dependency>
 
-        <!--        should be changed to postgres-->
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.1.214</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.6.2</version>
         </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>10.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>10.14.0</version>
         </dependency>
 
         <dependency>
