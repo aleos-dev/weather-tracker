@@ -10,4 +10,4 @@ CREATE TABLE users
 );
 
 INSERT INTO users (username, password, role_id)
-VALUES ('admin', 'admin', (SELECT id FROM authorization_role WHERE role = 'ADMIN'));
+VALUES ('admin', 'secret123', (SELECT id FROM authorization_role WHERE role = 'ADMIN'));
