@@ -6,6 +6,7 @@ import com.aleos.http.CustomHttpSession;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.core.GrantedAuthority;
 import com.aleos.security.core.Role;
+import com.aleos.security.web.filters.AnonymousAuthenticationFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ public class AuthorizationManager {
     }
 
     private boolean isRegistrationRequired(boolean isAllowed, Authentication auth) {
-        boolean registrationRequired = !isAllowed && Role.ANONYMOUS.name().equals(auth.getPrincipal());
+        boolean registrationRequired = !isAllowed && AnonymousAuthenticationFilter.ANONYMOUS_USER.equals(auth.getPrincipal());
 
         logger.debug("Registration required: {}", registrationRequired);
         return registrationRequired;
