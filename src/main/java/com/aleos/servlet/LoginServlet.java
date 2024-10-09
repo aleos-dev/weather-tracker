@@ -1,42 +1,27 @@
 package com.aleos.servlet;
 
-import com.aleos.context.listener.TemplateEngineInitializer;
-import jakarta.servlet.ServletConfig;
+import com.aleos.http.CustomHttpSession;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.thymeleaf.ITemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
 
 @WebServlet("/api/v1/login")
-public class LoginServlet extends HttpServlet {
-
-    private transient ITemplateEngine templateEngine;
+public class LoginServlet extends AbstractThymeleafServlet {
 
     @Override
-    public void init(ServletConfig config) {
-        templateEngine = (ITemplateEngine) config.getServletContext()
-            .getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) {
+        processTemplate("login", req, res);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
-        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(req.getServletContext());
-        var ctx = new WebContext(application.buildExchange(req, res));
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
+        var originalRequest = ((CustomHttpSession) req
+                .getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY)).getOriginalRequest();
 
-        templateEngine.process("login", ctx, res.getWriter());
-    }
+        var redirectUri = originalRequest == null ? "/" : originalRequest;
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
-
-        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(req.getServletContext());
-        var ctx = new WebContext(application.buildExchange(req, res));
-
-        templateEngine.process("hello", ctx, res.getWriter());
+        sendRedirect(redirectUri, res);
     }
 }
