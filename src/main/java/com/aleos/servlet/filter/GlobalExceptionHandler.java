@@ -24,7 +24,7 @@ public class GlobalExceptionHandler extends HttpFilter {
             chain.doFilter(req, res);
         } catch (ResourceNotFoundException e) {
             logger.debug("Redirect to: {}", BASE_REDIRECT_URL, e);
-            res.sendRedirect(BASE_REDIRECT_URL);
+            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
             logger.debug("Unknown error", e);
             res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

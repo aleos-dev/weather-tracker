@@ -17,6 +17,19 @@ h2 {
 }
 
 .error-message {
-    color: red;
-    text-align: center;
+    color: #d9534f; /* Bootstrap Danger color */
+    background-color: #f8d7da; /* Light red background to indicate an error */
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.error-message ul {
+    list-style: none; /* Remove default bullet points */
+    padding-left: 0;
+}
+
+.error-message li {
+    margin-bottom: 5px; /* Space between error messages */
 }
