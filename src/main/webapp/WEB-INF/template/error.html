@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/css/error.css">
+</head>
+<body>
+<div class="container">
+    <h1>Error</h1>
+    <div class="error-message">
+        <p th:if="${errorMessage}" th:text="${errorMessage}">An unexpected error has occurred.</p>
+        <p th:if="${errorMessage == null}">An unexpected error has occurred.</p>
+    </div>
+    <div class="home-link">
+        <a th:href="@{/}">Return to Home Page</a>
+    </div>
+</div>
+</body>
+</html>
