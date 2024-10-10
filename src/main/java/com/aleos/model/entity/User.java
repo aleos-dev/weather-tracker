@@ -1,8 +1,8 @@
 package com.aleos.model.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,17 +26,19 @@ public class User {
     private Long id;
 
     @NaturalId
-    @Min(USERNAME_MIN_LENGTH)
-    @Max(USERNAME_MAX_LENGTH)
+    @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH)
     @Column(unique = true, nullable = false)
     private String username;
 
-    @Min(PASSWORD_MIN_LENGTH)
-    @Max(PASSWORD_MAX_LENGTH)
+    @Size(min = PASSWORD_MIN_LENGTH, max =  PASSWORD_MAX_LENGTH)
     @Column(nullable = false)
     private String password;
 
+    @Email
+    @Column(unique = true, nullable = false)
+    private String email;
+
     @ManyToOne
-    @JoinColumn(name = "role_id", nullable = false)
+    @JoinColumn(name = "role_id")
     private AuthorizationRole role;
 }
