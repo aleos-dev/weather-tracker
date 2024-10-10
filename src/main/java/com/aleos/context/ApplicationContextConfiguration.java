@@ -9,8 +9,7 @@ import com.aleos.security.encoder.BCryptPasswordEncoder;
 import com.aleos.security.encoder.PasswordEncoder;
 import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContextRepository;
-import com.aleos.service.AuthenticationService;
-import com.aleos.service.BaseAuthenticationService;
+import com.aleos.service.*;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;
@@ -57,18 +56,38 @@ public class ApplicationContextConfiguration {
         return new SessionManager();
     }
 
+    // Services
+
     @Bean
-    public AuthenticationService authenticationService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-        return new BaseAuthenticationService(userRepository, passwordEncoder);
+    public UserService userService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        return new UserService(userRepository, passwordEncoder);
+    }
+
+    @Bean
+    public AuthenticationService authenticationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public RegistrationService registrationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public VerificationService verificationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public EmailService emailService() {
+        return new EmailService();
     }
 
     @Bean
     public UserRepository userRepository(EntityManagerFactory entityManagerFactory) {
         return new UserRepository(entityManagerFactory);
     }
+
 
     // Security beans
     @Bean
