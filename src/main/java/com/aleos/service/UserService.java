@@ -4,7 +4,7 @@ import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
 import com.aleos.model.UserPayload;
 import com.aleos.model.entity.User;
-import com.aleos.model.entity.UserVerification;
+import com.aleos.model.entity.UserVerificationToken;
 import com.aleos.repository.UserRepository;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.core.AuthenticationToken;
@@ -12,6 +12,7 @@ import com.aleos.security.core.Role;
 import com.aleos.security.core.SimpleGrantedAuthority;
 import com.aleos.security.encoder.PasswordEncoder;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -26,6 +27,8 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     private final PasswordEncoder passwordEncoder;
 
+    private final ModelMapper mapper;
+
     @Override
     public Authentication authenticate(String username, String password) throws AuthenticationException {
         var user = userRepository.find(username)
@@ -39,32 +42,29 @@ public class UserService implements AuthenticationService, VerificationService, 
     }
 
     @Override
-    public Optional<UserVerification> register(UserPayload userDto) {
-        // todo: should be atomic, add mapper
-        Optional<User> founded = userRepository.find(userDto.getUsername());
-        if (founded.isEmpty()) {
-
-            User user = new User();
-            user.setUsername(userDto.getUsername());
-            user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-            user.setEmail(userDto.getEmail());
-
-            userRepository.save(user);
-
-            var token = createToken(user);
-            userRepository.saveVerificationToken(token);
-            return Optional.of(token);
-        }
-
-        return Optional.empty();
+    public Optional<UserVerificationToken> register(UserPayload userPayload) {
+        return userRepository.find(userPayload.getUsername()).isPresent()
+                ? Optional.empty()
+                : Optional.of(registerNewUser(userPayload));
     }
 
-    private UserVerification createToken(User user) {
-        UserVerification userVerification = new UserVerification();
-        userVerification.setUser(user);
-        userVerification.setToken(UUID.randomUUID());
-        userVerification.setExpirationDate(retrieveTokenExpiration());
-        return userVerification;
+    private UserVerificationToken registerNewUser(UserPayload userPayload) {
+        User user = mapper.map(userPayload, User.class);
+        userRepository.save(user);
+
+        UserVerificationToken token = createToken(user);
+        userRepository.saveVerificationToken(token);
+
+        return token;
+    }
+
+    private UserVerificationToken createToken(User user) {
+        UserVerificationToken userVerificationToken = new UserVerificationToken();
+        userVerificationToken.setUser(user);
+        userVerificationToken.setToken(UUID.randomUUID());
+        userVerificationToken.setExpirationDate(retrieveTokenExpiration());
+
+        return userVerificationToken;
     }
 
     private Instant retrieveTokenExpiration() {

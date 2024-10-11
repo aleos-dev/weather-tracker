@@ -16,6 +16,8 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,8 +61,10 @@ public class ApplicationContextConfiguration {
     // Services
 
     @Bean
-    public UserService userService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return new UserService(userRepository, passwordEncoder);
+    public UserService userService(UserRepository userRepository,
+                                   PasswordEncoder passwordEncoder,
+                                   ModelMapper modelMapper) {
+        return new UserService(userRepository, passwordEncoder, modelMapper);
     }
 
     @Bean
@@ -88,6 +92,15 @@ public class ApplicationContextConfiguration {
         return new UserRepository(entityManagerFactory);
     }
 
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT)
+                .setSkipNullEnabled(true);
+
+        return mapper;
+    }
 
     // Security beans
     @Bean
