@@ -52,14 +52,6 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    protected void sendRedirect(String redirectUrl, HttpServletResponse res) {
-        try {
-            res.sendRedirect(redirectUrl);
-        } catch (IOException e) {
-            throw new RedirectException("Failed to process redirect to %s".formatted(redirectUrl), e);
-        }
-    }
-
     protected <T> T parseSimpleDto(Class<T> dtoClass, HttpServletRequest req) {
         Field[] fields = dtoClass.getDeclaredFields();
         Constructor<?> dtoConstructor = getDeclaredConstructor(dtoClass, fields);
@@ -92,6 +84,20 @@ public class AbstractThymeleafServlet extends HttpServlet {
                                 .map(this::formatConstraintViolation)
                                 .toList()
                 ));
+    }
+
+    protected void sendRedirect(String redirectUrl, HttpServletResponse res) {
+        try {
+            res.sendRedirect(redirectUrl);
+        } catch (IOException e) {
+            throw new RedirectException("Failed to process redirect to %s".formatted(redirectUrl), e);
+        }
+    }
+
+
+    protected void renderErrorPageWithMessage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
+        req.setAttribute("errorData", ErrorData.fromSingleError(errorMessage));
+        processTemplate("error", req, res);
     }
 
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {
