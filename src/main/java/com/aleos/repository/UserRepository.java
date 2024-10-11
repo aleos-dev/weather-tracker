@@ -29,4 +29,11 @@ public class UserRepository {
     public Optional<User> findByTokenUuid(UUID token) {
         return verificationTokenDao.findUserByUuid(token);
     }
+
+    public void activate(User user) {
+        userDao.runWithinTx(em -> {
+            var merged = em.merge(user);
+            merged.setVerified(true);
+        });
+    }
 }

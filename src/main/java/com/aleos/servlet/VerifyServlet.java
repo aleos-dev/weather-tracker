@@ -1,8 +1,5 @@
 package com.aleos.servlet;
 
-import com.aleos.context.Properties;
-import com.aleos.model.ErrorData;
-import com.aleos.model.entity.User;
 import com.aleos.service.VerificationService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -16,8 +13,6 @@ import java.util.UUID;
 @WebServlet("/api/v1/verify")
 public class VerifyServlet extends AbstractThymeleafServlet {
 
-    private static final String ERROR_PAGE_URL = Properties.get("error.url").orElse("/");
-
     private transient VerificationService verificationService;
 
     @Override
@@ -28,19 +23,27 @@ public class VerifyServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
+        final String cannotParseUuidMessage = "The uuid can not be parsed.";
 
         getUuid(req).ifPresentOrElse(
-                token -> {
-                    Optional<User> verify = verificationService.verify(token);
-                    verify.ifPresent(user -> processTemplate("login", req, res));
-                },
-                () -> {
-                    req.setAttribute("errorData", ErrorData.fromSingleError("The uuid not valid."));
-                    sendRedirect(ERROR_PAGE_URL, res);
-                });
+                uuidToken -> processVerificationResult(uuidToken, req, res),
+                () -> renderErrorPageWithMessage(req, res, cannotParseUuidMessage)
+        );
     }
 
-    private static Optional<UUID> getUuid(HttpServletRequest req) {
+    private void processVerificationResult(UUID uuidToken,
+                                           HttpServletRequest req,
+                                           HttpServletResponse res) {
+        final String verificationErrorMessage = "The token %s cannot be verified.";
+
+        if (verificationService.verify(uuidToken)) {
+            renderLoginPage(req, res);
+        } else {
+            renderErrorPageWithMessage(req, res, verificationErrorMessage.formatted(uuidToken.toString()));
+        }
+    }
+
+    private Optional<UUID> getUuid(HttpServletRequest req) {
         try {
             String token = req.getParameter("token");
             UUID tokenUUID = UUID.fromString(token);
@@ -50,5 +53,9 @@ public class VerifyServlet extends AbstractThymeleafServlet {
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
+    }
+
+    private void renderLoginPage(HttpServletRequest req, HttpServletResponse res) {
+        processTemplate("login", req, res);
     }
 }

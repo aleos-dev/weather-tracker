@@ -3,6 +3,7 @@ package com.aleos.security.web.filters;
 import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
 import com.aleos.http.CustomHttpSession;
+import com.aleos.model.ErrorData;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.web.context.SecurityContextHolder;
 import com.aleos.service.AuthenticationService;
@@ -35,11 +36,14 @@ public class AuthenticationFilter extends HttpFilter {
             var password = req.getParameter(PASSWORD_PARAM);
 
             try {
+
                 authenticateUser(username, password);
 
             } catch (AuthenticationException e) {
+                //logger
                 setOriginalRequestInSession(req);
-                res.sendRedirect(AUTH_URI);
+                req.setAttribute("errorData", ErrorData.fromSingleError(e.getMessage()));
+                req.getRequestDispatcher(AUTH_URI).forward(req, res);
                 return;
             }
         }

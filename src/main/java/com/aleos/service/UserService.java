@@ -35,7 +35,10 @@ public class UserService implements AuthenticationService, VerificationService, 
                 .orElseThrow(() -> new AuthenticationException("The user does not exist"));
 
         if (passwordEncoder.matches(password, user.getPassword())) {
-            return new AuthenticationToken(username, password, new SimpleGrantedAuthority(Role.USER));
+            if (user.isVerified()) {
+                return new AuthenticationToken(username, password, new SimpleGrantedAuthority(Role.USER));
+            }
+            throw new AuthenticationException("The user is not verified. Check your email for further instructions.");
         }
 
         throw new AuthenticationException("The password is incorrect");
@@ -44,6 +47,7 @@ public class UserService implements AuthenticationService, VerificationService, 
     @Override
     public UserVerificationToken register(UserPayload userPayload) {
             User user = mapper.map(userPayload, User.class);
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
 
             UserVerificationToken token = createToken(user);
@@ -75,7 +79,10 @@ public class UserService implements AuthenticationService, VerificationService, 
     }
 
     @Override
-    public Optional<User> verify(UUID token) {
-        return userRepository.findByTokenUuid(token);
+    public boolean verify(UUID token) {
+        Optional<User> userOptional = userRepository.findByTokenUuid(token);
+        userOptional.ifPresent(userRepository::activate);
+
+        return userOptional.isPresent();
     }
 }

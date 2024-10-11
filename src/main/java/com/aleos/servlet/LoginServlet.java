@@ -13,17 +13,28 @@ public class LoginServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        processTemplate("login", req, res);
+        renderLoginPage(req, res);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
-        var originalRequest = ((CustomHttpSession) req
-                .getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY)).getOriginalRequest();
+        if (req.getAttribute("errorData") == null) {
 
-        var redirectUri = originalRequest == null
-                ? DEFAULT_REDIRECT_URI : originalRequest;
+            var originalRequest = ((CustomHttpSession) req
+                    .getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY)).getOriginalRequest();
 
-        sendRedirect(redirectUri, res);
+            var redirectUri = originalRequest == null
+                    ? DEFAULT_REDIRECT_URI : originalRequest;
+
+            sendRedirect(redirectUri, res);
+
+        } else {
+
+            renderLoginPage(req, res);
+        }
+    }
+
+    private void renderLoginPage(HttpServletRequest req, HttpServletResponse res) {
+        processTemplate("login", req, res);
     }
 }

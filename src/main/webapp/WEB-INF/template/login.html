@@ -11,9 +11,13 @@
     <h2>Login</h2>
 
     <!-- Display error message if login failed -->
-    <ul th:if="${errorData != null}" th:each="error : ${errorData.errors}">
-        <li th:text="${error}"></li>
-    </ul>
+    <div th:if="${errorData != null}" class="error-message">
+        <ul>
+            <li th:each="error : ${errorData.errors}" th:text="${error}"></li>
+        </ul>
+    </div>
+
+
 
     <!-- Login form -->
     <form th:action="@{/api/v1/login}" method="post">
