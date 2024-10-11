@@ -1,8 +1,7 @@
 package com.aleos.servlet;
 
-import com.aleos.context.Properties;
 import com.aleos.model.UserPayload;
-import com.aleos.model.entity.UserVerification;
+import com.aleos.model.entity.UserVerificationToken;
 import com.aleos.service.EmailService;
 import com.aleos.service.RegistrationService;
 import jakarta.servlet.ServletConfig;
@@ -29,41 +28,39 @@ public class RegistrationServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        req.setAttribute("appContext", Properties.get("app.context").orElse("/"));
-        processRegistration(req, res);
+        renderRegistrationPage(req, res);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
-        UserPayload userPayload = parseSimpleDto(UserPayload.class, req);
-        var constraintViolations = validatePayload(validator, userPayload);
+        if (req.getAttribute("errorData") == null) {
+            UserPayload userPayload = parseSimpleDto(UserPayload.class, req);
+            var errorDataOpt = validatePayload(validator, userPayload);
 
-        constraintViolations.ifPresentOrElse(
-                violations -> {
-                    req.setAttribute("errors", violations);
-                    processRegistration(req, res);
-                },
-                () -> {
-                    var tokenOpt = regService.register(userPayload);
-                    tokenOpt.ifPresentOrElse(token -> sendConfirmation(token, req),
-                            () -> {
-                                req.setAttribute("errorMessage", "User already exists");
-                                processRegistration(req, res);
-                            }
-                    );
-                }
-        );
+            errorDataOpt.ifPresentOrElse(
+                    errorData -> req.setAttribute("errorData", errorData),
+
+                    () -> handleRegistration(req, userPayload)
+            );
+        }
+
+        renderRegistrationPage(req, res);
     }
 
-    private void sendConfirmation(UserVerification token, HttpServletRequest req) {
+    private void renderRegistrationPage(HttpServletRequest req, HttpServletResponse res) {
+        processTemplate("register", req, res);
+    }
+
+    private void handleRegistration(HttpServletRequest req, UserPayload userPayload) {
+        UserVerificationToken token = regService.register(userPayload);
+        sendConfirmation(token, req);
+        req.setAttribute("successMessage", "Registration successful! Please check your email for verification.");
+    }
+
+    private void sendConfirmation(UserVerificationToken token, HttpServletRequest req) {
         String requestUrl = req.getRequestURL().toString().replace("register", "verify");
         String verificationUrl = requestUrl + "?token=" + token.getToken();
 
         emailService.sendVerificationEmail(token.getUser().getEmail(), verificationUrl);
     }
-
-    private void processRegistration(HttpServletRequest req, HttpServletResponse res) {
-        processTemplate("registration", req, res);
-    }
-
 }

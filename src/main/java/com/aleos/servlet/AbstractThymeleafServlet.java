@@ -3,10 +3,11 @@ package com.aleos.servlet;
 import com.aleos.context.listener.TemplateEngineInitializer;
 import com.aleos.context.servicelocator.BeanFactory;
 import com.aleos.context.servicelocator.ServiceLocator;
-import com.aleos.exception.ParseDtoException;
+import com.aleos.exception.service.ParseDtoException;
 import com.aleos.exception.context.BeanInitializationException;
 import com.aleos.exception.servlet.RedirectException;
 import com.aleos.exception.servlet.ResponseWritingException;
+import com.aleos.model.ErrorData;
 import com.aleos.model.annotation.RequestParam;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -25,7 +26,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -79,7 +79,7 @@ public class AbstractThymeleafServlet extends HttpServlet {
         return (T) createObject(dtoConstructor, args);
     }
 
-    protected <T> Optional<List<String>> validatePayload(Validator payloadValidator, T inputPayload) {
+    protected <T> Optional<ErrorData> validatePayload(Validator payloadValidator, T inputPayload) {
         Set<ConstraintViolation<T>> constraintViolations = payloadValidator.validate(inputPayload);
 
         if (constraintViolations.isEmpty()) {
@@ -87,10 +87,11 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
 
         return Optional.of(
-                constraintViolations.stream()
-                        .map(this::formatConstraintViolation)
-                        .toList()
-        );
+                new ErrorData(
+                        constraintViolations.stream()
+                                .map(this::formatConstraintViolation)
+                                .toList()
+                ));
     }
 
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {

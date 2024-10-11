@@ -11,9 +11,9 @@
     <h2>Login</h2>
 
     <!-- Display error message if login failed -->
-    <div th:if="${error}" class="error-message">
-        <p>Invalid username or password. Please try again.</p>
-    </div>
+    <ul th:if="${errorData != null}" th:each="error : ${errorData.errors}">
+        <li th:text="${error}"></li>
+    </ul>
 
     <!-- Login form -->
     <form th:action="@{/api/v1/login}" method="post">

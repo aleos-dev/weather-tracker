@@ -1,8 +1,11 @@
 package com.aleos.servlet;
 
 import com.aleos.context.Properties;
+import com.aleos.model.ErrorData;
 import com.aleos.model.entity.User;
 import com.aleos.service.VerificationService;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +21,12 @@ public class VerifyServlet extends AbstractThymeleafServlet {
     private transient VerificationService verificationService;
 
     @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        verificationService = serviceLocator.getBean(VerificationService.class);
+    }
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
 
         getUuid(req).ifPresentOrElse(
@@ -26,7 +35,7 @@ public class VerifyServlet extends AbstractThymeleafServlet {
                     verify.ifPresent(user -> processTemplate("login", req, res));
                 },
                 () -> {
-                    req.setAttribute("errorMessage", "The uuid not valid.");
+                    req.setAttribute("errorData", ErrorData.fromSingleError("The uuid not valid."));
                     sendRedirect(ERROR_PAGE_URL, res);
                 });
     }

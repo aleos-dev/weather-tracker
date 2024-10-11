@@ -10,8 +10,10 @@
 <div class="container">
     <h1>Error</h1>
     <div class="error-message">
-        <p th:if="${errorMessage}" th:text="${errorMessage}">An unexpected error has occurred.</p>
-        <p th:if="${errorMessage == null}">An unexpected error has occurred.</p>
+        <ul th:if="${errorData != null}" th:each="error : ${errorData.errors}">
+            <li th:text="${error}"></li>
+        </ul>
+        <p th:if="${errorData == null}">An unexpected error has occurred.</p>
     </div>
     <div class="home-link">
         <a th:href="@{/}">Return to Home Page</a>
