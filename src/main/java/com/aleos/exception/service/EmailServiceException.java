@@ -1,4 +1,4 @@
-package com.aleos.exception;
+package com.aleos.exception.service;
 
 public class EmailServiceException extends RuntimeException {
 

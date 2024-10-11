@@ -3,7 +3,11 @@ package com.aleos.context;
 
 import com.aleos.context.annotation.Bean;
 import com.aleos.http.SessionManager;
+import com.aleos.model.entity.User;
+import com.aleos.model.entity.UserVerificationToken;
+import com.aleos.repository.UserDao;
 import com.aleos.repository.UserRepository;
+import com.aleos.repository.VerificationTokenDao;
 import com.aleos.security.authorization.AuthorizationManager;
 import com.aleos.security.encoder.BCryptPasswordEncoder;
 import com.aleos.security.encoder.PasswordEncoder;
@@ -87,9 +91,21 @@ public class ApplicationContextConfiguration {
         return new EmailService();
     }
 
+    // Repositories
+
     @Bean
-    public UserRepository userRepository(EntityManagerFactory entityManagerFactory) {
-        return new UserRepository(entityManagerFactory);
+    public UserDao userDao(EntityManagerFactory entityManagerFactory) {
+        return new UserDao(entityManagerFactory, User.class);
+    }
+
+    @Bean
+    public VerificationTokenDao verificationTokenDao(EntityManagerFactory entityManagerFactory) {
+        return new VerificationTokenDao(entityManagerFactory, UserVerificationToken.class);
+    }
+
+    @Bean
+    public UserRepository userRepository(UserDao userDao, VerificationTokenDao verificationTokenDao) {
+        return new UserRepository(userDao, verificationTokenDao);
     }
 
     @Bean

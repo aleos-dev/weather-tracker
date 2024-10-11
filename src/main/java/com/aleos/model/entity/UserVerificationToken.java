@@ -17,7 +17,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "token")
-public class UserVerification {
+public class UserVerificationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

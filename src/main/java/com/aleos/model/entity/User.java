@@ -17,7 +17,6 @@ import org.hibernate.annotations.NaturalId;
 public class User {
     private static final int USERNAME_MIN_LENGTH = 3;
     private static final int USERNAME_MAX_LENGTH = 10;
-
     private static final int PASSWORD_MIN_LENGTH = 3;
     private static final int PASSWORD_MAX_LENGTH = 10;
 
@@ -25,20 +24,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NaturalId
-    @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH)
-    @Column(unique = true, nullable = false)
+
+    @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH,
+          message = "Username must be between {min} and {max} characters long.")
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Size(min = PASSWORD_MIN_LENGTH, max =  PASSWORD_MAX_LENGTH)
+    @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH,
+          message = "Password must be between {min} and {max} characters long.")
     @Column(nullable = false)
     private String password;
 
-    @Email
-    @Column(unique = true, nullable = false)
+    @Email(message = "Email should be valid.")
+    @NaturalId
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id", nullable = false)
     private AuthorizationRole role;
 }

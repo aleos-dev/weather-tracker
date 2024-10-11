@@ -42,20 +42,14 @@ public class UserService implements AuthenticationService, VerificationService, 
     }
 
     @Override
-    public Optional<UserVerificationToken> register(UserPayload userPayload) {
-        return userRepository.find(userPayload.getUsername()).isPresent()
-                ? Optional.empty()
-                : Optional.of(registerNewUser(userPayload));
-    }
+    public UserVerificationToken register(UserPayload userPayload) {
+            User user = mapper.map(userPayload, User.class);
+            userRepository.save(user);
 
-    private UserVerificationToken registerNewUser(UserPayload userPayload) {
-        User user = mapper.map(userPayload, User.class);
-        userRepository.save(user);
+            UserVerificationToken token = createToken(user);
+            userRepository.saveToken(token);
 
-        UserVerificationToken token = createToken(user);
-        userRepository.saveVerificationToken(token);
-
-        return token;
+            return token;
     }
 
     private UserVerificationToken createToken(User user) {
@@ -82,6 +76,6 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     @Override
     public Optional<User> verify(UUID token) {
-        return userRepository.verify(token);
+        return userRepository.findByTokenUuid(token);
     }
 }

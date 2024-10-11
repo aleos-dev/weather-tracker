@@ -1,6 +1,6 @@
 package com.aleos.service;
 
-import com.aleos.exception.EmailServiceException;
+import com.aleos.exception.service.EmailServiceException;
 import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import org.slf4j.Logger;
@@ -36,7 +36,6 @@ public class EmailService {
 
             Transport.send(message);
         } catch (MessagingException ex) {
-            logger.error("Failed to send email", ex);
             throw new EmailServiceException("Failed to send email", ex);
         }
     }
