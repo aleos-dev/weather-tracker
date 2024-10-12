@@ -10,7 +10,7 @@ import java.util.Properties;
 public class EmailService {
     public static final Logger logger = org.slf4j.LoggerFactory.getLogger(EmailService.class);
 
-    private static final String SENDER_EMAIL = "oal.aleos@gmail.com";
+    private static final String SENDER_EMAIL = System.getenv("weather_tracker_mail_service_sender");
     private static final String EMAIL_SERVICE_CODE = System.getenv("weather_tracker_mail_service_code");
 
     public void sendVerificationEmail(String toEmail, String verificationUrl) {
