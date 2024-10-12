@@ -48,5 +48,6 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     @Override
     public void invalidate() {
         attributes.clear();
+        lastAccessedTime = 0;
     }
 }

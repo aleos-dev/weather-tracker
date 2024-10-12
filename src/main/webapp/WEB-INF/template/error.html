@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="/css/error.css">
+</head>
+<body>
+<div class="container">
+    <h1>Error</h1>
+    <div class="error-message">
+        <ul th:if="${errorData != null}" th:each="error : ${errorData.errors}">
+            <li th:text="${error}"></li>
+        </ul>
+        <p th:if="${errorData == null}">An unexpected error has occurred.</p>
+    </div>
+    <div class="home-link">
+        <a th:href="@{/api/v1/welcome}">Return to Home Page</a>
+    </div>
+</div>
+</body>
+</html>

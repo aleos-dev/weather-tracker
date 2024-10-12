@@ -58,7 +58,7 @@ public class AuthorizationManager {
     }
 
     private List<Role> getAllowedRolesForRequest(String requestUri) {
-        logger.debug("Finding allowed roles for URI: {}", requestUri);
+        logger.debug("Retrieving authorization roles for the requested URI: {}", requestUri);
         return authorizationRules.entrySet().stream()
                 .filter(entry -> requestUri.startsWith(entry.getKey()))
                 .map(Map.Entry::getValue)

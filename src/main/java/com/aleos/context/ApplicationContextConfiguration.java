@@ -3,20 +3,25 @@ package com.aleos.context;
 
 import com.aleos.context.annotation.Bean;
 import com.aleos.http.SessionManager;
+import com.aleos.model.entity.User;
+import com.aleos.model.entity.UserVerificationToken;
+import com.aleos.repository.UserDao;
 import com.aleos.repository.UserRepository;
+import com.aleos.repository.VerificationTokenDao;
 import com.aleos.security.authorization.AuthorizationManager;
 import com.aleos.security.encoder.BCryptPasswordEncoder;
 import com.aleos.security.encoder.PasswordEncoder;
 import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContextRepository;
-import com.aleos.service.AuthenticationService;
-import com.aleos.service.BaseAuthenticationService;
+import com.aleos.service.*;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,17 +62,60 @@ public class ApplicationContextConfiguration {
         return new SessionManager();
     }
 
+    // Services
+
     @Bean
-    public AuthenticationService authenticationService(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder
-    ) {
-        return new BaseAuthenticationService(userRepository, passwordEncoder);
+    public UserService userService(UserRepository userRepository,
+                                   PasswordEncoder passwordEncoder,
+                                   ModelMapper modelMapper) {
+        return new UserService(userRepository, passwordEncoder, modelMapper);
     }
 
     @Bean
-    public UserRepository userRepository(EntityManagerFactory entityManagerFactory) {
-        return new UserRepository(entityManagerFactory);
+    public AuthenticationService authenticationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public RegistrationService registrationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public VerificationService verificationService(UserService userService) {
+        return userService;
+    }
+
+    @Bean
+    public EmailService emailService() {
+        return new EmailService();
+    }
+
+    // Repositories
+
+    @Bean
+    public UserDao userDao(EntityManagerFactory entityManagerFactory) {
+        return new UserDao(entityManagerFactory, User.class);
+    }
+
+    @Bean
+    public VerificationTokenDao verificationTokenDao(EntityManagerFactory entityManagerFactory) {
+        return new VerificationTokenDao(entityManagerFactory, UserVerificationToken.class);
+    }
+
+    @Bean
+    public UserRepository userRepository(UserDao userDao, VerificationTokenDao verificationTokenDao) {
+        return new UserRepository(userDao, verificationTokenDao);
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper mapper = new ModelMapper();
+        mapper.getConfiguration()
+                .setMatchingStrategy(MatchingStrategies.STRICT)
+                .setSkipNullEnabled(true);
+
+        return mapper;
     }
 
     // Security beans

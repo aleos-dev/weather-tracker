@@ -1,30 +1,39 @@
 package com.aleos.repository;
 
 import com.aleos.model.entity.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.TypedQuery;
+import com.aleos.model.entity.UserVerificationToken;
 import lombok.AllArgsConstructor;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class UserRepository {
 
-    private final EntityManagerFactory emf;
+    private final UserDao userDao;
+    private final VerificationTokenDao verificationTokenDao;
+
+    public void save(User user) {
+        userDao.save(user);
+    }
+
+    public void saveToken(UserVerificationToken token) {
+        verificationTokenDao.save(token);
+    }
 
     public Optional<User> find(String username) {
-        EntityManager em = emf.createEntityManager();
-        try {
-            TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
-            query.setParameter("username", username);
-            User user = query.getSingleResult();
-            return Optional.ofNullable(user);
-        } catch (NoResultException e) {
-            return Optional.empty();
-        } finally {
-            em.close();
-        }
+        return userDao.find(username);
+    }
+
+
+    public Optional<User> findByTokenUuid(UUID token) {
+        return verificationTokenDao.findUserByUuid(token);
+    }
+
+    public void activate(User user) {
+        userDao.runWithinTx(em -> {
+            var merged = em.merge(user);
+            merged.setVerified(true);
+        });
     }
 }
