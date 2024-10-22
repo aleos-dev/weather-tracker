@@ -48,13 +48,14 @@ public class AuthorizationManager {
 
     private Authentication getAuthenticatedUser(Supplier<Authentication> authentication) {
         var auth = authentication.get();
-        if (auth == null || !auth.isAuthenticated()) {
-            logger.error("Authorization failed. User is not authenticated.");
-            throw new AuthenticationException("Not authenticated");
+
+        if ((auth != null && (auth.isAuthenticated() || auth.isAnonymous()))) {
+            logger.info("Authentication is retrieved for {}", auth.getPrincipal());
+            return auth;
         }
 
-        logger.info("{} user is authenticated.", auth.getPrincipal());
-        return auth;
+        logger.error("Authorization failed. User is not authenticated.");
+        throw new AuthenticationException("Not authenticated");
     }
 
     private List<Role> getAllowedRolesForRequest(String requestUri) {

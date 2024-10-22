@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 
 public class HttpSessionSecurityContextRepository implements SecurityContextRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpSessionSecurityContextRepository.class);
-
     public static final String SECURITY_CONTEXT_KEY = "SECURITY_CONTEXT";
+
+    private static final Logger logger = LoggerFactory.getLogger(HttpSessionSecurityContextRepository.class);
 
     private static final String SESSION_CONTEXT_KEY = CustomHttpSession.SESSION_CONTEXT_KEY;
 

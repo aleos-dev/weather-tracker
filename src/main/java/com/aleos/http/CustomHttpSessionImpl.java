@@ -1,5 +1,7 @@
 package com.aleos.http;
 
+import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
+import com.aleos.security.web.context.SecurityContext;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,6 +40,14 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     @Override
     public void setAttribute(String name, Object value) {
         attributes.put(name, value);
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        var context =
+                (SecurityContext) attributes.get(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
+
+        return context != null && context.isAuthenticated();
     }
 
     @Override

@@ -16,4 +16,8 @@ public class SecurityContextImpl implements SecurityContext {
         this.authentication = authentication;
     }
 
+    @Override
+    public boolean isAuthenticated() {
+        return authentication != null && authentication.isAuthenticated();
+    }
 }

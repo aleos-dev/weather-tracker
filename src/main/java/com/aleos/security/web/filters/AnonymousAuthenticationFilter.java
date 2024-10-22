@@ -45,6 +45,9 @@ public class AnonymousAuthenticationFilter extends HttpFilter {
     }
 
     private Authentication createAuthentication() {
-        return new AuthenticationToken(ANONYMOUS_USER, ANONYMOUS_PASS, new SimpleGrantedAuthority(Role.ANONYMOUS));
+        var authToken = new AuthenticationToken(ANONYMOUS_USER, ANONYMOUS_PASS,
+                new SimpleGrantedAuthority(Role.ANONYMOUS));
+        authToken.isAuthenticated(false);
+        return authToken;
     }
 }

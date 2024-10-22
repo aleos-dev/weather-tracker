@@ -7,6 +7,7 @@ import com.aleos.exception.service.ParseDtoException;
 import com.aleos.exception.context.BeanInitializationException;
 import com.aleos.exception.servlet.RedirectException;
 import com.aleos.exception.servlet.ResponseWritingException;
+import com.aleos.http.CustomHttpSession;
 import com.aleos.model.ErrorData;
 import com.aleos.model.annotation.RequestParam;
 import jakarta.servlet.ServletConfig;
@@ -94,10 +95,14 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-
     protected void renderErrorPageWithMessage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
         req.setAttribute("errorData", ErrorData.fromSingleError(errorMessage));
         processTemplate("error", req, res);
+    }
+
+
+    protected CustomHttpSession getSessionContext(HttpServletRequest req) {
+        return (CustomHttpSession) req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY);
     }
 
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {

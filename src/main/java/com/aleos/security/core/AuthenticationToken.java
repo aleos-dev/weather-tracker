@@ -21,7 +21,7 @@ public class AuthenticationToken implements Authentication {
         this.principal = principal;
         this.credential = credential;
         this.authorities = Arrays.asList(authorities);
-            authenticated = true;
+        authenticated = true;
     }
 
     @Override

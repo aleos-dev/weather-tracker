@@ -12,13 +12,18 @@ public interface CustomHttpSession {
         UUID getId();
 
         Object getAttribute(String name);
+
         void setAttribute(String name, Object value);
 
         long getLastAccessedTime();
+
         void setLastAccessedTime(long lastAccessedTime);
 
         String getOriginalRequest();
+
         void setOriginalRequest(String originalRequest);
+
+        boolean isAuthenticated();
 
         void removeAttribute(String name);
 
