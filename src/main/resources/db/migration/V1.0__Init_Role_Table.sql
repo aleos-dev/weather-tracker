@@ -1,13 +1,13 @@
-CREATE TABLE authorization_role
+CREATE TABLE Authorization_role
 (
-    id   BIGSERIAL PRIMARY KEY,
+    id   BIGINT      NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+
     role VARCHAR(50) NOT NULL,
+
     CONSTRAINT authorization_role_role_unique UNIQUE (role)
 );
 
-INSERT INTO authorization_role (role)
-VALUES ('ADMIN');
-INSERT INTO authorization_role (role)
-VALUES ('USER');
-INSERT INTO authorization_role (role)
-VALUES ('ANONYMOUS');
+INSERT INTO Authorization_role (role)
+VALUES ('ADMIN'),
+       ('USER'),
+       ('ANONYMOUS');

@@ -14,6 +14,6 @@ $$ LANGUAGE plpgsql;
 
 -- Step 2: Create a trigger that calls the function before inserting a new user
 CREATE TRIGGER set_default_role_trigger
-    BEFORE INSERT ON users
+    BEFORE INSERT ON Users
     FOR EACH ROW
 EXECUTE FUNCTION set_default_role();
