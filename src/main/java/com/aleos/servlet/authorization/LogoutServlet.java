@@ -1,6 +1,7 @@
-package com.aleos.servlet;
+package com.aleos.servlet.authorization;
 
 import com.aleos.http.CustomHttpSession;
+import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

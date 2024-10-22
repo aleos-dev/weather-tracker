@@ -1,7 +1,7 @@
-package com.aleos.servlet;
+package com.aleos.servlet.authorization;
 
 import com.aleos.context.Properties;
-import com.aleos.http.CustomHttpSession;
+import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,15 +13,21 @@ public class LoginServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        renderLoginPage(req, res);
+        if (getSessionContext(req).isAuthenticated()) {
+
+            renderMainPage(req, res);
+
+        } else {
+
+            renderLoginPage(req, res);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         if (req.getAttribute("errorData") == null) {
 
-            var originalRequest = ((CustomHttpSession) req
-                    .getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY)).getOriginalRequest();
+            var originalRequest = getSessionContext(req).getOriginalRequest();
 
             var redirectUri = originalRequest == null
                     ? DEFAULT_REDIRECT_URI : originalRequest;
@@ -36,5 +42,9 @@ public class LoginServlet extends AbstractThymeleafServlet {
 
     private void renderLoginPage(HttpServletRequest req, HttpServletResponse res) {
         processTemplate("login", req, res);
+    }
+
+    private void renderMainPage(HttpServletRequest req, HttpServletResponse res) {
+        processTemplate("weather", req, res);
     }
 }

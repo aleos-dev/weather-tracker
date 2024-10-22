@@ -1,9 +1,10 @@
-package com.aleos.servlet;
+package com.aleos.servlet.authorization;
 
 import com.aleos.model.UserPayload;
 import com.aleos.model.entity.UserVerificationToken;
 import com.aleos.service.EmailService;
 import com.aleos.service.RegistrationService;
+import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

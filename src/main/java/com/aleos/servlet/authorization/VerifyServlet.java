@@ -1,6 +1,7 @@
-package com.aleos.servlet;
+package com.aleos.servlet.authorization;
 
 import com.aleos.service.VerificationService;
+import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
