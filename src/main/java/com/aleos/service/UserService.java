@@ -3,6 +3,8 @@ package com.aleos.service;
 import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
 import com.aleos.model.UserPayload;
+import com.aleos.model.dto.LocationWeatherResponse;
+import com.aleos.model.entity.Location;
 import com.aleos.model.entity.User;
 import com.aleos.model.entity.UserVerificationToken;
 import com.aleos.repository.UserRepository;
@@ -16,6 +18,7 @@ import org.modelmapper.ModelMapper;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,9 +28,33 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     private final UserRepository userRepository;
 
+    private final WeatherApiClient weatherApiClient;
+
     private final PasswordEncoder passwordEncoder;
 
     private final ModelMapper mapper;
+
+    public List<LocationWeatherResponse> findAllLocations(String username) {
+        return userRepository.streamUserLocationsData(username)
+                .map(row -> {
+                    var lat = (double) row[0];
+                    var lon = (double) row[1];
+                    var weatherData = weatherApiClient.getWeatherByLocation(lat, lon);
+
+                    var preferredName = (String) row[2];
+                    return LocationWeatherResponse.of(
+                            preferredName,
+                            lon,
+                            lat,
+                            weatherData);
+                }).toList();
+    }
+
+    public void setLocationForUser(String username, String locationName, Double lon, Double lat) {
+        var location = new Location(locationName, lon, lat);
+        userRepository.addLocationToUser(username, location);
+    }
+
 
     @Override
     public Authentication authenticate(String username, String password) throws AuthenticationException {
@@ -46,14 +73,22 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     @Override
     public UserVerificationToken register(UserPayload userPayload) {
-            User user = mapper.map(userPayload, User.class);
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(user);
+        User user = mapper.map(userPayload, User.class);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
 
-            UserVerificationToken token = createToken(user);
-            userRepository.saveToken(token);
+        UserVerificationToken token = createToken(user);
+        userRepository.saveToken(token);
 
-            return token;
+        return token;
+    }
+
+    @Override
+    public boolean verify(UUID token) {
+        Optional<User> userOptional = userRepository.findByTokenUuid(token);
+        userOptional.ifPresent(userRepository::activate);
+
+        return userOptional.isPresent();
     }
 
     private UserVerificationToken createToken(User user) {
@@ -78,11 +113,4 @@ public class UserService implements AuthenticationService, VerificationService, 
         }
     }
 
-    @Override
-    public boolean verify(UUID token) {
-        Optional<User> userOptional = userRepository.findByTokenUuid(token);
-        userOptional.ifPresent(userRepository::activate);
-
-        return userOptional.isPresent();
-    }
 }

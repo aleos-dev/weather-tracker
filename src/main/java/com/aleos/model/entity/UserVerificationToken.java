@@ -24,6 +24,7 @@ public class UserVerificationToken {
     private Long id;
 
     @NaturalId
+    @Column(unique = true, nullable = false)
     private UUID token;
 
     @ManyToOne(fetch = FetchType.LAZY)

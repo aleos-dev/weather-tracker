@@ -50,7 +50,6 @@ public class User {
     private boolean verified;
 
     @ManyToMany(mappedBy = "users")
-
     private Set<Location> locations;
 
     public boolean equals(final Object o) {
