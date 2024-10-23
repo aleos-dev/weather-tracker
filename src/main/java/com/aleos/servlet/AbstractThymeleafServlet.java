@@ -10,6 +10,7 @@ import com.aleos.exception.servlet.ResponseWritingException;
 import com.aleos.http.CustomHttpSession;
 import com.aleos.model.ErrorData;
 import com.aleos.model.annotation.RequestParam;
+import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -100,9 +101,15 @@ public class AbstractThymeleafServlet extends HttpServlet {
         processTemplate("error", req, res);
     }
 
-
     protected CustomHttpSession getSessionContext(HttpServletRequest req) {
         return (CustomHttpSession) req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY);
+    }
+
+    protected String retrieveAuthenticationPrincipal(HttpServletRequest req) {
+        var securityContext = (HttpSessionSecurityContextRepository) getSessionContext(req).
+                getAttribute(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
+
+        return securityContext.loadContext(req).getAuthentication().getPrincipal();
     }
 
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {
