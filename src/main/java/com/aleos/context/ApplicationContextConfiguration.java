@@ -14,6 +14,7 @@ import com.aleos.security.encoder.PasswordEncoder;
 import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContextRepository;
 import com.aleos.service.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;
@@ -23,6 +24,7 @@ import org.flywaydb.core.Flyway;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 
+import java.net.http.HttpClient;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,9 +68,10 @@ public class ApplicationContextConfiguration {
 
     @Bean
     public UserService userService(UserRepository userRepository,
+                                   WeatherApiClient weatherApiClient,
                                    PasswordEncoder passwordEncoder,
                                    ModelMapper modelMapper) {
-        return new UserService(userRepository, passwordEncoder, modelMapper);
+        return new UserService(userRepository, weatherApiClient, passwordEncoder, modelMapper);
     }
 
     @Bean
@@ -89,6 +92,16 @@ public class ApplicationContextConfiguration {
     @Bean
     public EmailService emailService() {
         return new EmailService();
+    }
+
+    @Bean
+    public HttpClient httpClient() {
+        return HttpClient.newHttpClient();
+    }
+
+    @Bean
+    public WeatherApiClient weatherApiClient(HttpClient httpClient, ObjectMapper objectMapper) {
+        return new OpenWeatherApiClient(httpClient, objectMapper);
     }
 
     // Repositories
@@ -132,6 +145,11 @@ public class ApplicationContextConfiguration {
     @Bean
     public AuthorizationManager authorizationManager() {
         return new AuthorizationManager();
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 
     private Map<String, String> loadHibernateProperties() {
