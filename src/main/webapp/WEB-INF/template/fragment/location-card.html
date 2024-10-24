@@ -1,0 +1,45 @@
+<div th:fragment="location-search-card">
+    <div class="card h-100">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${location.name}">Location Name</h5>
+            <div class="map">
+                <iframe class="card-img-bottom"
+                        th:src="'https://maps.google.com/maps?q=' + ${location.coordinates.lat} + ',' + ${location.coordinates.lon} + '&z=8&output=embed'"
+                        style="border:0; width:100%; height:200px;" allowfullscreen></iframe>
+            </div>
+            <form th:action="@{/api/v1/locations}" method="post">
+                <input type="hidden" name="lat" th:value="${location.coordinates.lon}">
+                <input type="hidden" name="lon" th:value="${location.coordinates.lat}">
+                <input type="hidden" name="locationName" th:value="${location.name}">
+                <button type="submit" class="btn btn-primary">Add to bookmarks</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="location-weather-card">
+    <div class="card h-100">
+        <div class="card-body" th:object="${location}">
+            <h5 class="card-title" th:text="*{name}">Location Name</h5>
+
+            <div class="weather-info">
+                <li th:each="stateItem : *{weatherData.state}">
+                    <span class="state-main" th:text="${stateItem.main}">Weather Main</span> -
+                    <span class="state-description" th:text="${stateItem.description}">Weather Description</span>
+                    <span class="state-icon" th:text="${stateItem.icon}">Icon</span>
+                </li>
+                <span class="temperature" th:if="*{weatherData.main != null}" th:text="*{weatherData.main.temp}">Weather
+                    temperature</span>
+                <span class="humidity" th:if="*{weatherData.main != null}"
+                      th:text="*{weatherData.main.humidity}">Weather
+                    humidity</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:fragment="location-summary">
+    <!-- Location Summary Content -->
+    <p th:text="${location.description}">Location summary goes here.</p>
+</div>
+

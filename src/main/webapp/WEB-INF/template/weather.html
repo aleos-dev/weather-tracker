@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Weather today</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
+<head th:replace="~{/fragment/head :: head ('Weather tracker')}"></head>
 <body>
 <div class="weather-container">
-    <h2>the user location</h2>
+    <h2>The user location</h2>
 </div>
+
+<form th:action="@{/api/v1/locations}" method="get">
+    <input type="text" name="query" placeholder="Search locations">
+    <button type="submit">Search</button>
+</form>
+
+<div class="locations-list row">
+    <div class="col-md-4 mb-3" th:each="location : ${locationsByQuery}">
+        <div th:insert="~{fragment/location-card :: location-search-card}"></div>
+    </div>
+</div>
+
+<div class="locations-list row">
+    <div class="col-md-4 mb-3" th:each="location : ${userLocationsWeather}">
+        <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
+    </div>
+</div>
+
+!-- Bootstrap JS and dependencies (jQuery, Popper.js) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -13,7 +13,7 @@ public class WeatherApiResponse {
     private long locationId;
 
     @JsonProperty("weather")
-    private List<Weather> weathersList;
+    private List<State> state;
 
     private Main main;
 
@@ -28,7 +28,7 @@ public class WeatherApiResponse {
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Weather {
+    public static class State {
         private int id;
         private String main;
         private String description;
@@ -39,9 +39,12 @@ public class WeatherApiResponse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Main {
         private double temp;
-        @JsonProperty("feels_like") private double feelsLike;
-        @JsonProperty("temp_min") private double tempMin;
-        @JsonProperty("temp_max") private double tempMax;
+        @JsonProperty("feels_like")
+        private double feelsLike;
+        @JsonProperty("temp_min")
+        private double tempMin;
+        @JsonProperty("temp_max")
+        private double tempMax;
         private int pressure;
         private int humidity;
     }
