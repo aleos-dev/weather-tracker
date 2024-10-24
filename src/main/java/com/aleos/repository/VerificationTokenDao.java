@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VerificationTokenDao extends CrudDao<UserVerificationToken, Long> {
+public class VerificationTokenDao extends CrudDao<UserVerificationToken> {
 
     public VerificationTokenDao(EntityManagerFactory emf, Class<UserVerificationToken> clazz) {
         super(emf, clazz);

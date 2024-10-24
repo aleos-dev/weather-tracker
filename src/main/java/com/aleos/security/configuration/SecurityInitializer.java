@@ -47,13 +47,17 @@ public final class SecurityInitializer {
         String baseUrl = Properties.get("base.url").orElse("/");
 
         Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
+        authorizationRules.put(baseUrl, List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/css", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
+        authorizationRules.put("/resources/bootstrap.min.css", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
+
+        authorizationRules.put("/api/v1/locations", List.of(Role.USER, Role.ADMIN));
+
         authorizationRules.put("/api/v1/login", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/logout", List.of(Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/error", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/verify", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/register", List.of(Role.ANONYMOUS));
-        authorizationRules.put(baseUrl, List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/weather", List.of(Role.USER, Role.ADMIN));
         authorizationRules.put("/api/v1/", List.of(Role.ADMIN));
 

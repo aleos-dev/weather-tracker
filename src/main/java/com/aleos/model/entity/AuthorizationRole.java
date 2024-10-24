@@ -7,12 +7,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "authorization_role")
 @EqualsAndHashCode(of = "role")
 @Getter
 @Setter
-public class AuthorizationRole {
+public class AuthorizationRole implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
