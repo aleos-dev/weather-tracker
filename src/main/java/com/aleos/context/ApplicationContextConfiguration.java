@@ -3,9 +3,7 @@ package com.aleos.context;
 
 import com.aleos.context.annotation.Bean;
 import com.aleos.http.SessionManager;
-import com.aleos.model.entity.User;
 import com.aleos.model.entity.UserVerificationToken;
-import com.aleos.repository.UserDao;
 import com.aleos.repository.UserRepository;
 import com.aleos.repository.VerificationTokenDao;
 import com.aleos.security.authorization.AuthorizationManager;
@@ -106,10 +104,6 @@ public class ApplicationContextConfiguration {
 
     // Repositories
 
-    @Bean
-    public UserDao userDao(EntityManagerFactory entityManagerFactory) {
-        return new UserDao(entityManagerFactory, User.class);
-    }
 
     @Bean
     public VerificationTokenDao verificationTokenDao(EntityManagerFactory entityManagerFactory) {
@@ -117,8 +111,8 @@ public class ApplicationContextConfiguration {
     }
 
     @Bean
-    public UserRepository userRepository(UserDao userDao, VerificationTokenDao verificationTokenDao) {
-        return new UserRepository(userDao, verificationTokenDao);
+    public UserRepository userRepository(EntityManagerFactory entityManagerFactory, VerificationTokenDao verificationTokenDao) {
+        return new UserRepository(entityManagerFactory, verificationTokenDao);
     }
 
     @Bean
