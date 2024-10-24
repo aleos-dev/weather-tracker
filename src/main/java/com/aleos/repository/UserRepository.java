@@ -4,39 +4,52 @@ import com.aleos.model.entity.Location;
 import com.aleos.model.entity.User;
 import com.aleos.model.entity.UserVerificationToken;
 import jakarta.persistence.EntityManager;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 
+public class UserRepository extends CrudDao<User> {
 
-@AllArgsConstructor
-public class UserRepository {
-
-    private final UserDao userDao;
     private final VerificationTokenDao verificationTokenDao;
 
-    public void save(User user) {
-        userDao.save(user);
+    public UserRepository(EntityManagerFactory emf, VerificationTokenDao verificationTokenDao) {
+        super(emf, User.class);
+        this.verificationTokenDao = verificationTokenDao;
     }
 
-    public void addLocationToUser(String username, Location location) {
-        userDao.runWithinTx(em -> {
-            User user = em.getReference(User.class, username);
-            updateUserLocation(location, user, em);
+    public void updateUserLocationByUserName(String username, Location location) {
+        runWithinTx(em -> {
+
+            var user = findByUsername(username, em)
+                    .orElseThrow();
+
+            var foundedLocation = Optional.ofNullable(em.unwrap(Session.class)
+                    .bySimpleNaturalId(Location.class)
+                    .load(location.getCoordinates()));
+
+            foundedLocation.ifPresentOrElse(
+                    user::addUserLocation,
+                    () -> {
+                        em.persist(location);
+                        user.addUserLocation(location);
+                    });
+        });
+
+    }
+
+    public void removeLocation(String username, Location location) {
+        runWithinTx(em -> {
+
+            var user = findByUsername(username, em);
+            user.ifPresent(u -> u.removeLocation(location));
         });
     }
 
-    public void removeLocationFromUser(String username, Location location) {
-        userDao.runWithinTx(em -> {
-            User user = em.getReference(User.class, username);
-            user.getLocations().remove(location);
-        });
-    }
-
-    public Stream<Object[]> streamUserLocationsData(String username) {
+    public List<Object[]> fetchUserLocationData(String username) {
         String sql = """
                  SELECT l.longitude, l.latitude,
                         COALESCE(ul.name, l.name) AS name
@@ -47,36 +60,34 @@ public class UserRepository {
                  ORDER BY l.id;
                 """;
 
-        return userDao.callWithinTx(em -> em.createNativeQuery(sql)
+        return callWithinTx(em -> em.createNativeQuery(sql)
                 .unwrap(Query.class)
                 .setParameter("username", username)
-                .setMaxResults(5)
-                .stream());
+                .stream().toList());
     }
 
     public void saveToken(UserVerificationToken token) {
         verificationTokenDao.save(token);
     }
 
-    public Optional<User> find(String username) {
-        return userDao.find(username);
-    }
-
-
     public Optional<User> findByTokenUuid(UUID token) {
         return verificationTokenDao.findUserByUuid(token);
     }
 
     public void activate(User user) {
-        userDao.runWithinTx(em -> {
+        runWithinTx(em -> {
             var merged = em.merge(user);
             merged.setVerified(true);
         });
     }
 
-    private void updateUserLocation(Location location, User user, EntityManager em) {
-        Location mergedLocation = em.merge(location);
-        user.getLocations().add(mergedLocation);
+    public Optional<User> find(String username) {
+        return callWithinTx(em -> findByUsername(username, em));
+    }
+
+    private Optional<User> findByUsername(String username, EntityManager em) {
+        return Optional.ofNullable(em.unwrap(Session.class).bySimpleNaturalId(User.class)
+                .load(username));
     }
 
 }

@@ -34,8 +34,9 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     private final ModelMapper mapper;
 
-    public List<LocationWeatherResponse> findAllLocations(String username) {
-        return userRepository.streamUserLocationsData(username)
+    public List<LocationWeatherResponse> findWeatherForAllLocationsByUsername(String username) {
+        return userRepository.fetchUserLocationData(username)
+                .stream()
                 .map(row -> {
                     var lat = (double) row[0];
                     var lon = (double) row[1];
@@ -52,7 +53,7 @@ public class UserService implements AuthenticationService, VerificationService, 
 
     public void setLocationForUser(String username, String locationName, Double lon, Double lat) {
         var location = new Location(locationName, lon, lat);
-        userRepository.addLocationToUser(username, location);
+        userRepository.updateUserLocationByUserName(username, location);
     }
 
 

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @RequiredArgsConstructor
-public abstract class CrudDao<E, K> {
+public abstract class CrudDao<E> {
 
     protected final EntityManagerFactory emf;
 
@@ -22,18 +22,18 @@ public abstract class CrudDao<E, K> {
     }
 
     public <T> T callWithinTx(Function<EntityManager, T> emFunc) {
-    try (var em = emf.createEntityManager()) {
-        em.getTransaction().begin();
-        try {
-            T result = emFunc.apply(em);
-            em.getTransaction().commit();
-            return result;
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            handleException(e);
-            throw new DaoOperationException(e.getMessage() == null ? "Transaction is rolled back." : e.getMessage(), e);
+        try (var em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                T result = emFunc.apply(em);
+                em.getTransaction().commit();
+                return result;
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                handleException(e);
+                throw new DaoOperationException(e.getMessage() == null ? "Transaction is rolled back." : e.getMessage(), e);
+            }
         }
-    }
     }
 
     public void runWithinTx(Consumer<EntityManager> emConsumer) {

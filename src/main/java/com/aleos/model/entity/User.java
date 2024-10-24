@@ -7,17 +7,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
+import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
-import static jakarta.persistence.CascadeType.MERGE;
-import static jakarta.persistence.CascadeType.PERSIST;
+import static jakarta.persistence.CascadeType.*;
 
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
     private static final int USERNAME_MIN_LENGTH = 3;
     private static final int USERNAME_MAX_LENGTH = 10;
     private static final int PASSWORD_MIN_LENGTH = 3;
@@ -27,9 +28,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH,
             message = "Username must be between {min} and {max} characters long.")
+    @NaturalId
     @Column(nullable = false, unique = true)
     private String username;
 
@@ -39,7 +40,6 @@ public class User {
     private String password;
 
     @Email(message = "Email should be valid.")
-    @NaturalId
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -49,8 +49,24 @@ public class User {
 
     private boolean verified;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<Location> locations;
+    @OneToMany(mappedBy = "userLocationId.user", cascade = ALL, orphanRemoval = true)
+    private Set<UserLocation> userLocations = new HashSet<>();
+
+    public void addUserLocation(Location location) {
+        var assignedName = location.getName();
+        UserLocation userLocation = new UserLocation(new UserLocationId(this, location), assignedName);
+        userLocations.add(userLocation);
+    }
+
+    public void removeLocation(Location location) {
+        userLocations.removeIf(userLocation -> {
+            if (userLocation.getUserLocationId().getLocation().equals(location)) {
+                userLocation.setUserLocationId(null);
+                return true;
+            }
+            return false;
+        });
+    }
 
     public boolean equals(final Object o) {
         if (o == this) return true;

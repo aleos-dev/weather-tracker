@@ -1,0 +1,43 @@
+package com.aleos.model.entity;
+
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+@Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+public class UserLocationId implements Serializable {
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_user_location"))
+//    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_user_location"))
+//    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o instanceof UserLocationId that) {
+            return Objects.equals(user, that.user) && Objects.equals(location, that.location);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user, location);
+    }
+}
