@@ -9,6 +9,7 @@ public class WelcomeServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
+
         processTemplate("welcome", req, res);
     }
 }
