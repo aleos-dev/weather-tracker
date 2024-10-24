@@ -1,0 +1,2 @@
+ALTER TABLE User_location
+ALTER COLUMN name TYPE VARCHAR(50);
