@@ -1,31 +1,65 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head th:replace="~{/fragment/head :: head ('Weather tracker')}"></head>
+
 <body>
-<div class="weather-container">
-    <h2>The user location</h2>
-</div>
+<!-- Messages -->
+<div th:replace="~{/fragment/messages :: displayMessage}"></div>
+<div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-<form th:action="@{/api/v1/locations}" method="get">
-    <input type="text" name="query" placeholder="Search locations">
-    <button type="submit">Search</button>
-</form>
+<!-- Definitions for conditions -->
+<div class="weather-container"
+     th:with=" isEmptyQueries=${#lists.isEmpty(locationsByQuery)},
+                  hasQueries=${!#lists.isEmpty(locationsByQuery)},
+                  hasUserLocations=${!#lists.isEmpty(userLocationsWeather)}">
 
-<div class="locations-list row">
-    <div class="col-md-4 mb-3" th:each="location : ${locationsByQuery}">
-        <div th:insert="~{fragment/location-card :: location-search-card}"></div>
+    <!-- Display header based on the state of the collections -->
+    <h2 th:if="${isEmptyQueries and !hasUserLocations}">No tracked locations</h2>
+    <h2 th:if="${hasQueries}">Choose location to be tracked</h2>
+    <h2 th:if="${hasUserLocations}">Tracked Locations</h2>
+
+    <!-- Search form to search for new locations -->
+    <form th:action="@{/api/v1/locations}" method="get" class="d-flex align-items-center">
+        <label for="query" class="queryLabel me-2">Search locations</label>
+
+        <!-- Search input -->
+        <input type="text" name="query" id="query" placeholder="Search locations" class="form-control me-3"
+               style="flex: 1;">
+
+        <!-- Search button -->
+        <button type="submit" class="btn btn-primary">Search</button>
+
+        <!-- "Go Back" link -->
+        <div class="back-link me-3" th:if="${!hasUserLocation}">
+            <a href="/api/v1/weather" class="btn btn-outline-secondary">&larr; Go Back to Tracked Locations</a>
+        </div>
+    </form>
+
+    <!-- Display search results for locations if available -->
+    <div class="locations-list row" th:if="${hasQueries}">
+        <div class="col-md-4 mb-3" th:each="location : ${locationsByQuery}">
+            <div th:insert="~{fragment/location-card :: location-search-card}"></div>
+        </div>
+    </div>
+
+    <!-- Display the user's tracked locations if available -->
+    <div class="locations-list row" th:if="${hasUserLocations}">
+        <div class="col-md-4 mb-3" th:each="locationWeather : ${userLocationsWeather}">
+            <div class="weather-card"
+                 th:attr="data-temp=${locationWeather.weatherDetails.temperatureInfo.currentTemp}">
+                <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
+
+                <!-- Trivia Popup -->
+                <div class="trivia-popup" style="display: none;">
+                    <p id="trivia-content">Loading trivia...</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="locations-list row">
-    <div class="col-md-4 mb-3" th:each="location : ${userLocationsWeather}">
-        <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
-    </div>
-</div>
+<script src="/resources/js/weather.js"></script>
 
-!-- Bootstrap JS and dependencies (jQuery, Popper.js) -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

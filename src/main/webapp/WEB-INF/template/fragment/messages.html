@@ -1,0 +1,15 @@
+<!-- Fragment for displaying a message -->
+<div th:fragment="displayMessage">
+    <div th:if="${message != null}" class="message">
+        <span th:text="${message}"></span>
+    </div>
+</div>
+
+<!-- Fragment for displaying error messages -->
+<div th:fragment="displayErrorMessage">
+    <div th:if="${errors != null}" class="error-message">
+        <ul>
+            <li th:each="error : ${errors.errors}" th:text="${error}"></li>
+        </ul>
+    </div>
+</div>
