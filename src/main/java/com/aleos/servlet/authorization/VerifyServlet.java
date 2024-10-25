@@ -1,7 +1,6 @@
 package com.aleos.servlet.authorization;
 
 import com.aleos.service.VerificationService;
-import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @WebServlet("/api/v1/verify")
-public class VerifyServlet extends AbstractThymeleafServlet {
+public class VerifyServlet extends AbstractAuthServlet {
 
     private transient VerificationService verificationService;
 
@@ -24,23 +23,23 @@ public class VerifyServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        final String cannotParseUuidMessage = "The uuid can not be parsed.";
+        final String cannotParseUuidMessage = "UUID invalid format. It can't be parsed.";
 
         getUuid(req).ifPresentOrElse(
                 uuidToken -> processVerificationResult(uuidToken, req, res),
-                () -> renderErrorPageWithMessage(req, res, cannotParseUuidMessage)
+                () -> renderErrorPage(req, res, cannotParseUuidMessage)
         );
     }
 
     private void processVerificationResult(UUID uuidToken,
                                            HttpServletRequest req,
                                            HttpServletResponse res) {
-        final String verificationErrorMessage = "The token %s cannot be verified.";
+        final String verificationErrorMessage = "The UUID token %s is invalid. It can't be verified.";
 
         if (verificationService.verify(uuidToken)) {
-            renderLoginPage(req, res);
+            renderSignInPage(req, res);
         } else {
-            renderErrorPageWithMessage(req, res, verificationErrorMessage.formatted(uuidToken.toString()));
+            renderErrorPage(req, res, verificationErrorMessage.formatted(uuidToken.toString()));
         }
     }
 
@@ -54,9 +53,5 @@ public class VerifyServlet extends AbstractThymeleafServlet {
         } catch (IllegalArgumentException e) {
             return Optional.empty();
         }
-    }
-
-    private void renderLoginPage(HttpServletRequest req, HttpServletResponse res) {
-        processTemplate("login", req, res);
     }
 }

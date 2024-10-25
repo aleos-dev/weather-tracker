@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Form</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/registration.css}">
+</head>
+<body>
+<div class="container">
+    <h2>Sign Up</h2>
+
+    <div th:replace="~{/fragment/messages :: displayMessage}"></div>
+
+    <div th:if="${message == null}">
+        <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
+
+        <form th:action="@{~/api/v1/sign-up}" method="post">
+            <div>
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <button type="submit">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

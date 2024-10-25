@@ -1,10 +1,11 @@
 package com.aleos.servlet;
 
+import com.aleos.context.Properties;
 import com.aleos.context.listener.TemplateEngineInitializer;
 import com.aleos.context.servicelocator.BeanFactory;
 import com.aleos.context.servicelocator.ServiceLocator;
-import com.aleos.exception.service.ParseDtoException;
 import com.aleos.exception.context.BeanInitializationException;
+import com.aleos.exception.service.ParseDtoException;
 import com.aleos.exception.servlet.RedirectException;
 import com.aleos.exception.servlet.ResponseWritingException;
 import com.aleos.http.CustomHttpSession;
@@ -35,8 +36,16 @@ import java.util.Set;
 public class AbstractThymeleafServlet extends HttpServlet {
     public static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractThymeleafServlet.class);
 
+    protected static final String DEFAULT_WELCOME_URI = Properties.get("base.url").orElse("/api/v1/welcome");
+    protected static final String DEFAULT_WEATHER_URI = Properties.get("base.auth.url").orElse("/api/v1/weather");
+    protected static final String DEFAULT_AUTH_URI = Properties.get("auth.url").orElse("/api/v1/sign-in");
+
+    protected static final String ERROR_ATTRIBUTE_KEY = "errors";
+    protected static final String MESSAGE_ATTRIBUTE_KEY = "message";
+
     protected transient ITemplateEngine templateEngine;
     protected transient ServiceLocator serviceLocator;
+
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -97,9 +106,9 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    protected void renderErrorPageWithMessage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
-        req.setAttribute("errorData", ErrorData.fromSingleError(errorMessage));
-        processTemplate("error", req, res);
+    protected void renderErrorPage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
+        req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorData.fromSingleError(errorMessage));
+        processTemplate("errorPage", req, res);
     }
 
     protected CustomHttpSession getSessionContext(HttpServletRequest req) {
@@ -111,6 +120,10 @@ public class AbstractThymeleafServlet extends HttpServlet {
                 getAttribute(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
 
         return securityContext.getAuthentication().getPrincipal();
+    }
+
+    protected boolean hasNoErrorAttribute(HttpServletRequest req) {
+        return req.getAttribute(ERROR_ATTRIBUTE_KEY) == null;
     }
 
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {
