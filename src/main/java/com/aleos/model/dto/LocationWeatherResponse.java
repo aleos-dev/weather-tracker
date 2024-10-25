@@ -6,11 +6,11 @@ import lombok.Value;
 @Value(staticConstructor = "of")
 public class LocationWeatherResponse {
 
-    private String name;
+    String locationName;
 
-    private double latitude;
+    double latitude;
 
-    private double longitude;
+    double longitude;
 
-    private WeatherApiResponse weatherData;
+    WeatherApiResponse weatherDetails;
 }

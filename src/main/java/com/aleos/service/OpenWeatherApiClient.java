@@ -31,15 +31,11 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     private static final String NAME_FORMAT = "%s - %s";
 
-    private static final int API_RESPONSE_LIMIT =
-            Integer.parseInt(Properties.get("weather.api.response.limit").orElse("8"));
+    private static final int API_RESPONSE_LIMIT = Integer.parseInt(Properties.get("weather.api.response.limit").orElse("8"));
 
-    private static final String OPEN_WEATHER_URL_FORMAT = "https://api.openweathermap.org/data/2" +
-                                                          ".5/weather?lat=%s&lon=%s&appid=%s&units=%s";
+    private static final String OPEN_WEATHER_URL_FORMAT = "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s&units=%s";
 
     private static final String GEOCODING_URL_FORMAT = "https://api.openweathermap.org/geo/1.0/direct?q=%s&limit=%d&appid=%s";
-//    https://api.openweathermap.org/data/3.0/onecall/overview?lon=-11.8092&lat=51.509865&appid={API key}
-
 
     private final HttpClient httpClient;
 
@@ -66,20 +62,17 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
         HttpResponse<String> response = getStringHttpResponse(locationRequest);
 
-        WeatherApiResponse weatherResponse;
+        WeatherApiResponse weatherResponse = new WeatherApiResponse();
 
         if (response.statusCode() == SC_OK) {
 
             try {
                 weatherResponse = objectMapper.readValue(response.body(), WeatherApiResponse.class);
+                weatherResponse.setDataAvailable(true);
             } catch (JsonProcessingException e) {
                 logger.error(e.getMessage(), e);
                 throw new WeatherClientException("JsonProcessingException");
             }
-
-        } else {
-            weatherResponse = new WeatherApiResponse();
-            weatherResponse.setPresent(false);
         }
 
         return weatherResponse;
