@@ -20,9 +20,9 @@ import static jakarta.persistence.CascadeType.*;
 @Setter
 public class User implements Serializable {
     private static final int USERNAME_MIN_LENGTH = 3;
-    private static final int USERNAME_MAX_LENGTH = 10;
+    private static final int USERNAME_MAX_LENGTH = 32;
     private static final int PASSWORD_MIN_LENGTH = 3;
-    private static final int PASSWORD_MAX_LENGTH = 16;
+    private static final int PASSWORD_MAX_LENGTH = 32;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
