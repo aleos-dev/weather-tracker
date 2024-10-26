@@ -1,35 +1,27 @@
-/* /src/main/webapp/css/styles.css */
-.container {
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-}
-
-h2 {
-    text-align: center;
-}
-
-.form-group {
-    margin-bottom: 15px;
-}
-
-.error-message {
-    color: #d9534f; /* Bootstrap Danger color */
-    background-color: #f8d7da; /* Light red background to indicate an error */
-    border: 1px solid #f5c6cb;
+.weather-card {
+    min-width: 350px; /* Prevent the card from becoming too narrow */
     padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    text-align: center;
+    overflow: hidden; /* Prevent overflowing content */
 }
 
-.error-message ul {
-    list-style: none; /* Remove default bullet points */
-    padding-left: 0;
+.weather-card h5, .weather-card p {
+    white-space: nowrap; /* Prevent text from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
 
-.error-message li {
-    margin-bottom: 5px; /* Space between error messages */
+.container {
+    display: flex;
+    flex-wrap: wrap; /* Make sure cards wrap properly in small viewports */
+    justify-content: space-around;
+}
+
+.col-md-4 {
+    flex: 0 0 30%; /* Each card will take 30% width */
+    max-width: 30%;
+    margin-bottom: 1.5rem;
 }

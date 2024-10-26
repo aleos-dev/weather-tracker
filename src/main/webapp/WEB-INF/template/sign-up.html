@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Registration Form</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-    <link rel="stylesheet" th:href="@{/css/registration.css}">
-</head>
+
+<head th:replace="~{/fragment/head :: head ('Sign Up')}"></head>
+<link rel="stylesheet" th:href="@{/css/registration.css}">
+
 <body>
 <div class="container">
+    <div th:replace="~{/fragment/header :: simple-header}"></div>
+
     <h2>Sign Up</h2>
 
     <div th:replace="~{/fragment/messages :: displayMessage}"></div>
@@ -15,7 +15,7 @@
     <div th:if="${message == null}">
         <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-        <form th:action="@{~/api/v1/sign-up}" method="post">
+        <form th:action="@{~/api/v1/sign-up}" method="post" id="signUpForm">
             <div>
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name" required>
@@ -29,10 +29,18 @@
                 <input type="password" id="password" name="password" required>
             </div>
             <div>
-                <button type="submit">Register</button>
+                <label for="confirmPassword">Confirm Password:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <div>
+                <button type="submit">Submit</button>
             </div>
         </form>
     </div>
 </div>
+
+<script src="/resources/js/password-validation.js"></script>
+
+<div th:replace="~{/fragment/footer :: footer}"></div>
 </body>
 </html>

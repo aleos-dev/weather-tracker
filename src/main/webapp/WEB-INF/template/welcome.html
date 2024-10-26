@@ -4,19 +4,17 @@
 <head th:replace="~{/fragment/head :: head('Welcome to Weather Tracker')}"></head>
 
 <body>
+<div th:replace="~{/fragment/header :: full-header}"></div>
 
 <div class="container mt-5">
-    <!-- Welcome message and introduction -->
     <div class="text-center">
         <h1>Welcome to Weather Tracker</h1>
         <p class="lead">Track weather conditions of your favorite locations in real time.</p>
     </div>
 
-    <!-- Messages -->
     <div th:replace="~{/fragment/messages :: displayMessage}"></div>
     <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-    <!-- Information about features -->
     <div class="row mt-4">
         <div class="col-md-4 text-center">
             <img src="/resources/icons/weather.png" alt="Weather icon" class="img-fluid" style="max-height: 100px;">
@@ -25,7 +23,8 @@
         </div>
 
         <div class="col-md-4 text-center">
-            <img src="/resources/icons/track.png" alt="Track locations icon" class="img-fluid" style="max-height: 100px;">
+            <img src="/resources/icons/track.png" alt="Track locations icon" class="img-fluid"
+                 style="max-height: 100px;">
             <h3>Track Locations</h3>
             <p>Save and track the weather of multiple locations with ease.</p>
         </div>
@@ -37,12 +36,13 @@
         </div>
     </div>
 
-    <!-- Call to Action Section -->
     <div class="mt-5">
         <p class="lead">To get started, sign up or log in to start tracking your favorite locations.</p>
         <a href="/api/v1/sign-up" class="btn btn-primary btn-lg">Sign Up</a>
         <a href="/api/v1/sign-in" class="btn btn-secondary btn-lg">Sign In</a>
     </div>
+
+    <div th:replace="~{/fragment/footer :: footer}"></div>
 </div>
 </body>
 </html>

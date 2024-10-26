@@ -1,12 +1,15 @@
 <div th:fragment="location-search-card">
     <div class="card h-100">
         <div class="card-body">
+
             <h5 class="card-title" th:text="${location.name}">Location Name</h5>
+
             <div class="map">
                 <iframe class="card-img-bottom" title="google-map-frame"
                         th:src="'https://maps.google.com/maps?q=' + ${location.coordinates.lat} + ',' + ${location.coordinates.lon} + '&z=8&output=embed'"
                         style="border:0; width:100%; height:200px;" allowfullscreen></iframe>
             </div>
+
             <form th:action="@{/api/v1/locations}" method="post">
                 <input type="hidden" name="lat" th:value="${location.coordinates.lon}">
                 <input type="hidden" name="lon" th:value="${location.coordinates.lat}">
@@ -21,39 +24,33 @@
     <div class="card h-100">
         <div class="card-body" th:object="${locationWeather}">
 
-            <h5 class="card-title" th:text="*{locationName}"></h5>
+            <h5 class="card-title" th:text="*{locationName}">locationName</h5>
 
-            <!-- Weather Icon and Temperature -->
             <div class="d-flex align-items-center mb-2">
-                <!-- Weather Icon -->
                 <img class="card-img-top img-fluid" style="max-height: 50px; object-fit: contain;"
                      th:src="'https://openweathermap.org/img/wn/' + *{weatherDetails.weatherConditions[0].iconCode} + '@4x.png'"
                      alt="Weather icon">
-                <!-- Temperature -->
                 <span class="display-4 ms-2" th:text="*{weatherDetails.temperatureInfo.currentTemp + '°C'}"></span>
             </div>
 
-            <!-- Weather Description -->
             <div>
                 <span th:text="'Feels like ' + *{weatherDetails.temperatureInfo.feelsLikeTemp} + '°C'"></span>
                 <span th:text="*{weatherDetails.weatherConditions[0].description}"></span>
             </div>
 
             <div class="d-flex justify-content-between mt-3">
-                <!-- Wind -->
                 <div class="wind-info">
                     <i class="fas fa-wind"></i>
                     <span
                             th:text="' ' + *{weatherDetails.windDetails.windSpeed} + ' m/s ' + *{weatherDetails.windDetails.windDirection} + '°'"></span>
                 </div>
-                <!-- Pressure -->
+
                 <div class="pressure-info">
                     <i class="fas fa-tachometer-alt"></i>
                     <span th:text="*{weatherDetails.temperatureInfo.pressure + ' hPa'}"></span>
                 </div>
             </div>
 
-            <!-- Additional Info: Humidity, Visibility -->
             <div class="additional-info mt-2">
 
                 <span th:text="'Humidity: ' + *{weatherDetails.temperatureInfo.humidityPercentage} + '%'"></span><br>
@@ -62,9 +59,3 @@
         </div>
     </div>
 </div>
-
-<div th:fragment="location-summary">
-    <!-- Location Summary Content -->
-    <p th:text="${location.description}">Location summary goes here.</p>
-</div>
-

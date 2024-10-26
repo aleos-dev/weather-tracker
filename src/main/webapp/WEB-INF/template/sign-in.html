@@ -1,20 +1,17 @@
 <!DOCTYPE html>
 <html lang=en xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
-</head>
-<body>
 
+<head th:replace="~{/fragment/head :: head ('Sign In')}"></head>
+
+<body>
 <div class="container">
+    <div th:replace="~{/fragment/header :: simple-header}"></div>
+
     <h2>Sign-in</h2>
 
-    <!-- Messages -->
     <div th:replace="~{/fragment/messages :: displayMessage}"></div>
     <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-    <!-- Sign-in form -->
     <form th:action="@{/api/v1/sign-in}" method="post">
         <div class="form-group">
             <label for="username">Username</label>
@@ -29,5 +26,7 @@
 
     <p>Don't have an account? <a th:href="@{/api/v1/sign-up}">Sign-up here</a></p>
 </div>
+
+<div th:replace="~{/fragment/footer :: footer}"></div>
 </body>
 </html>
