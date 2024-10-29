@@ -17,9 +17,6 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     private final UUID id;
 
     @Getter
-    private final long creationTime;
-
-    @Getter
     @Setter
     private long lastAccessedTime;
 
@@ -29,9 +26,9 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
 
     public CustomHttpSessionImpl(UUID id) {
         this.id = id;
-        creationTime = System.currentTimeMillis();
-        lastAccessedTime = creationTime;
+        lastAccessedTime = System.currentTimeMillis();
     }
+
     @Override
     public Object getAttribute(String name) {
         return attributes.get(name);
@@ -51,8 +48,13 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     }
 
     @Override
-    public void removeAttribute(String name) {
-        attributes.remove(name);
+    public String getPrincipal() {
+        var context =
+                (SecurityContext) attributes.get(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
+
+        return isAuthenticated()
+                ? context.getAuthentication().getPrincipal()
+                : null;
     }
 
     @Override

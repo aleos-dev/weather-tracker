@@ -7,8 +7,6 @@ public interface CustomHttpSession {
 
         String SESSION_CONTEXT_KEY = "SESSION_CONTEXT";
 
-        long getCreationTime();
-
         UUID getId();
 
         Object getAttribute(String name);
@@ -25,7 +23,7 @@ public interface CustomHttpSession {
 
         boolean isAuthenticated();
 
-        void removeAttribute(String name);
+        String getPrincipal();
 
         void invalidate();
 }
