@@ -1,6 +1,5 @@
 package com.aleos.servlet.authorization;
 
-import com.aleos.http.CustomHttpSession;
 import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,13 +12,24 @@ public class AbstractAuthServlet extends AbstractThymeleafServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         if (hasNoErrorAttribute(req) && getSessionContext(req).isAuthenticated()) {
-            var originalRequest = getSessionContext(req).getOriginalRequest();
-            var redirectUri = originalRequest == null ? DEFAULT_WEATHER_URI : originalRequest;
-            sendRedirect(redirectUri, res);
-            return;
-        }
+            sendRedirect(getRedirectUri(req), res);
 
-        super.service(req, res);
+        } else {
+            super.service(req, res);
+        }
+    }
+
+    private String getRedirectUri(HttpServletRequest req) {
+        var originalRequestUri = getSessionContext(req).getOriginalRequest();
+
+        return (originalRequestUri == null || isALoop(req, originalRequestUri))
+                ? WEATHER_URI
+                : originalRequestUri;
+    }
+
+    private boolean isALoop(HttpServletRequest req, String originalRequestUri) {
+        String currentUri = req.getServletPath();
+        return currentUri.equalsIgnoreCase(originalRequestUri);
     }
 
     protected void renderSignInPage(HttpServletRequest req, HttpServletResponse res) {
@@ -29,11 +39,4 @@ public class AbstractAuthServlet extends AbstractThymeleafServlet {
     protected void renderSignUpPage(HttpServletRequest req, HttpServletResponse res) {
         processTemplate("sign-up", req, res);
     }
-
-    protected void signOutSession(HttpServletRequest req) {
-        if (req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY) instanceof CustomHttpSession  session) {
-            session.invalidate();
-        }
-    }
-
 }

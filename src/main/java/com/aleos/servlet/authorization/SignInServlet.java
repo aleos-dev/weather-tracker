@@ -8,12 +8,21 @@ import jakarta.servlet.http.HttpServletResponse;
 public class SignInServlet extends AbstractAuthServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse res) {
-        renderSignInPage(req, res);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        renderSignInPage(request, response);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse res) {
-        renderSignInPage(req, res);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        if (getSessionContext(request).isAuthenticated()) {
+            sendRedirect(WEATHER_URI, response);
+        } else {
+            handleUnauthenticatedUser(request, response);
+        }
+    }
+
+    private void handleUnauthenticatedUser(HttpServletRequest request, HttpServletResponse response) {
+        request.setAttribute("name", request.getParameter("name"));
+        renderSignInPage(request, response);
     }
 }

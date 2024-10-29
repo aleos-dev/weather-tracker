@@ -1,11 +1,13 @@
 package com.aleos.servlet.authorization;
 
+import com.aleos.http.CustomHttpSession;
+import com.aleos.servlet.AbstractThymeleafServlet;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/api/v1/sign-out")
-public class SignOutServlet extends AbstractAuthServlet {
+public class SignOutServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
@@ -13,11 +15,17 @@ public class SignOutServlet extends AbstractAuthServlet {
 
             signOutSession(req);
 
-            sendRedirect(DEFAULT_WELCOME_URI, res);
+            sendRedirect(WELCOME_URI, res);
             processTemplate("welcome", req, res);
 
         } else {
-            sendRedirect(DEFAULT_AUTH_URI, res);
+            sendRedirect(AUTH_URI, res);
+        }
+    }
+
+    protected void signOutSession(HttpServletRequest req) {
+        if (req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY) instanceof CustomHttpSession  session) {
+            session.invalidate();
         }
     }
 }
