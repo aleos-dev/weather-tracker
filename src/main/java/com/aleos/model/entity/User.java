@@ -22,7 +22,6 @@ public class User implements Serializable {
     private static final int USERNAME_MIN_LENGTH = 3;
     private static final int USERNAME_MAX_LENGTH = 32;
     private static final int PASSWORD_MIN_LENGTH = 3;
-    private static final int PASSWORD_MAX_LENGTH = 32;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +33,7 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Size(min = PASSWORD_MIN_LENGTH, max = PASSWORD_MAX_LENGTH,
-            message = "Password must be between {min} and {max} characters long.")
+    @Size(min = PASSWORD_MIN_LENGTH, message = "Password length should be at least {min} chars.")
     @Column(nullable = false)
     private String password;
 
@@ -58,9 +56,9 @@ public class User implements Serializable {
         userLocations.add(userLocation);
     }
 
-    public void removeLocation(Location location) {
+    public void removeLocationByCoordinates(Location.Coordinates coordinates) {
         userLocations.removeIf(userLocation -> {
-            if (userLocation.getUserLocationId().getLocation().equals(location)) {
+            if (userLocation.getUserLocationId().getLocation().getCoordinates().equals(coordinates)) {
                 userLocation.setUserLocationId(null);
                 return true;
             }

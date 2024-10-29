@@ -10,7 +10,7 @@ public class WelcomeServlet extends AbstractThymeleafServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
         if (getSessionContext(req).isAuthenticated()) {
-            processTemplate("weather", req,res);
+            sendRedirect(WEATHER_URI, res);
         }
 
         processTemplate("welcome", req, res);
