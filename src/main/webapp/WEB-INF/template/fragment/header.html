@@ -1,0 +1,42 @@
+<div th:fragment="full-header" xmlns:th="http://www.w3.org/1999/html">
+    <header class="navbar navbar-expand-lg navbar-light bg-light py-3">
+        <div class="container mt-4">
+            <img src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 40px;"/>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="personalLinksDropdown" role="button"
+                           data-toggle="dropdown" aria-expanded="false">
+                            🔗 Personal Links
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="personalLinksDropdown">
+                            <li><a class="dropdown-item" href="#">My Blog</a></li>
+                            <li><a class="dropdown-item" href="#">GitHub</a></li>
+                            <li><a class="dropdown-item" href="#">Leetcode</a></li>
+                            <li><a class="dropdown-item" href="#">About</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div th:if="${SESSION_CONTEXT.isAuthenticated()}" th:with="username=${SESSION_CONTEXT.getPrincipal()}">
+                <a class="nav-link btn btn-outline-danger" th:href="@{/api/v1/sign-out}">
+                    <span class="username fw-bold" th:text="${username}"></span> 🚪 Sign Out</a>
+            </div>
+        </div>
+    </header>
+</div>
+
+<!-- Simplified Header Fragment -->
+<div th:fragment="simple-header">
+    <div class="container">
+        <img src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 30px;">
+        <span>Weather Tracker</span>
+    </div>
+</div>
