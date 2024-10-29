@@ -10,6 +10,11 @@ import jakarta.servlet.annotation.WebListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Enumeration;
+
 @WebListener
 public class ApplicationContextInitializer implements ServletContextListener {
 
@@ -20,7 +25,6 @@ public class ApplicationContextInitializer implements ServletContextListener {
         injectFactoryBean(sce);
     }
 
-
     private void injectFactoryBean(ServletContextEvent sce) {
         try {
             var factory = new BeanFactory(ApplicationContextConfiguration.class);
@@ -30,9 +34,34 @@ public class ApplicationContextInitializer implements ServletContextListener {
         }
     }
 
-     @Override
+    @Override
     public void contextDestroyed(ServletContextEvent sce) {
+        logger.info("Servlet context is being destroyed. Cleaning up resources...");
+
+        closeEntityManagerFactory(sce);
+        unregisterJdbcDrivers();
+
+        logger.info("Context destruction complete.");
+    }
+
+    private void closeEntityManagerFactory(ServletContextEvent sce) {
+        logger.info("EntityManagerFactory is closed.");
         var locator = (ServiceLocator) sce.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
         locator.getBean(EntityManagerFactory.class).close();
+    }
+
+    private void unregisterJdbcDrivers() {
+
+        Enumeration<Driver> drivers = DriverManager.getDrivers();
+        while (drivers.hasMoreElements()) {
+            Driver driver = drivers.nextElement();
+            try {
+                DriverManager.deregisterDriver(driver);
+                logger.info("Successfully deregistered JDBC driver: {}", driver);
+            } catch (SQLException e) {
+                logger.error("Error deregistering JDBC driver: {}", driver, e);
+            }
+        }
+
     }
 }
