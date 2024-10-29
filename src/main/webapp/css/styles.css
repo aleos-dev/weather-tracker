@@ -14,14 +14,15 @@
     text-overflow: ellipsis; /* Add ellipsis for overflow */
 }
 
-.container {
+.locations-list {
     display: flex;
-    flex-wrap: wrap; /* Make sure cards wrap properly in small viewports */
+    flex-wrap: wrap;
     justify-content: space-around;
 }
 
-.col-md-4 {
-    flex: 0 0 30%; /* Each card will take 30% width */
+.locations-list .col-md-4 {
+    flex: 0 0 30%;
     max-width: 30%;
     margin-bottom: 1.5rem;
 }
+
