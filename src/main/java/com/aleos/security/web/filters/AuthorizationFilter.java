@@ -31,5 +31,4 @@ public class AuthorizationFilter extends HttpFilter {
     private Authentication getAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
-
 }

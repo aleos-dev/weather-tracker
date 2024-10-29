@@ -16,7 +16,6 @@ import java.util.function.Supplier;
 public class AnonymousAuthenticationFilter extends HttpFilter {
 
     public static final String ANONYMOUS_USER = "Anonymous";
-    private static final String ANONYMOUS_PASS = "";
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -45,8 +44,7 @@ public class AnonymousAuthenticationFilter extends HttpFilter {
     }
 
     private Authentication createAuthentication() {
-        var authToken = new AuthenticationToken(ANONYMOUS_USER, ANONYMOUS_PASS,
-                new SimpleGrantedAuthority(Role.ANONYMOUS));
+        var authToken = new AuthenticationToken(ANONYMOUS_USER, new SimpleGrantedAuthority(Role.ANONYMOUS));
         authToken.isAuthenticated(false);
         return authToken;
     }

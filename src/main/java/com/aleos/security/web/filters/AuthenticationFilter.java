@@ -3,7 +3,7 @@ package com.aleos.security.web.filters;
 import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
 import com.aleos.http.CustomHttpSession;
-import com.aleos.model.ErrorData;
+import com.aleos.model.ErrorDetails;
 import com.aleos.security.core.Authentication;
 import com.aleos.security.web.context.SecurityContextHolder;
 import com.aleos.service.AuthenticationService;
@@ -19,11 +19,11 @@ import java.io.IOException;
 @AllArgsConstructor
 public class AuthenticationFilter extends HttpFilter {
 
-    private static final String USERNAME_PARAM = "username";
+    private static final String USERNAME_PARAM = "name";
     private static final String PASSWORD_PARAM = "password";
 
     private static final String AUTH_METHOD = "POST";
-    private static final String AUTH_URI = Properties.get("auth.url").orElse("/api/v1/login");
+    private static final String AUTH_URI = Properties.get("auth.url").orElse("/api/v1/sign-in");
 
     private final transient AuthenticationService authenticationService;
 
@@ -42,7 +42,7 @@ public class AuthenticationFilter extends HttpFilter {
             } catch (AuthenticationException e) {
                 //logger
                 setOriginalRequestInSession(req);
-                req.setAttribute("errorData", ErrorData.fromSingleError(e.getMessage()));
+                req.setAttribute("errors", ErrorDetails.fromSingleError(e.getMessage()));
                 req.getRequestDispatcher(AUTH_URI).forward(req, res);
                 return;
             }
