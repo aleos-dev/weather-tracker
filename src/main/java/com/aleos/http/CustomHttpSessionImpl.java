@@ -1,15 +1,17 @@
 package com.aleos.http;
 
-import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
-import com.aleos.security.web.context.SecurityContext;
+import com.aleos.security.core.Authentication;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class CustomHttpSessionImpl implements CustomHttpSession {
+
+    private static final String AUTH_SESSION_KEY = "AUTHENTICATION";
 
     private final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
 
@@ -40,21 +42,25 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     }
 
     @Override
-    public boolean isAuthenticated() {
-        var context =
-                (SecurityContext) attributes.get(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
+    public Optional<Authentication> getAuthentication() {
+        return Optional.ofNullable((Authentication) attributes.get(AUTH_SESSION_KEY));
+    }
 
-        return context != null && context.isAuthenticated();
+    @Override
+    public void setAuthentication(Authentication auth) {
+        attributes.put(AUTH_SESSION_KEY, auth);
+    }
+
+    @Override
+    public boolean isAuthenticated() {
+        return getAuthentication()
+                .map(Authentication::isAuthenticated)
+                .orElse(false);
     }
 
     @Override
     public String getPrincipal() {
-        var context =
-                (SecurityContext) attributes.get(HttpSessionSecurityContextRepository.SECURITY_CONTEXT_KEY);
-
-        return isAuthenticated()
-                ? context.getAuthentication().getPrincipal()
-                : null;
+        return getAuthentication().map(Authentication::getPrincipal).orElse(null);
     }
 
     @Override

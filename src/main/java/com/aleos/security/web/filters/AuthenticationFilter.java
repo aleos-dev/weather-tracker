@@ -2,6 +2,7 @@ package com.aleos.security.web.filters;
 
 import com.aleos.context.Properties;
 import com.aleos.exception.context.AuthenticationException;
+import com.aleos.exception.security.InvalidSessionException;
 import com.aleos.http.CustomHttpSession;
 import com.aleos.model.ErrorDetails;
 import com.aleos.security.core.Authentication;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @AllArgsConstructor
 public class AuthenticationFilter extends HttpFilter {
@@ -29,6 +31,8 @@ public class AuthenticationFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        restoreAuthenticationFromSession(req);
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (isNotAuthenticated(auth) && isAuthRequest(req)) {
@@ -38,6 +42,7 @@ public class AuthenticationFilter extends HttpFilter {
             try {
 
                 authenticateUser(username, password);
+                saveAuthenticationToSession(req);
 
             } catch (AuthenticationException e) {
                 //logger
@@ -49,6 +54,20 @@ public class AuthenticationFilter extends HttpFilter {
         }
 
         chain.doFilter(req, res);
+    }
+
+    private void restoreAuthenticationFromSession(HttpServletRequest req) {
+        var session = getCustomHttpSession(req);
+        Optional<Authentication> auth = session.getAuthentication();
+        auth.ifPresent(SecurityContextHolder.getContext()::setAuthentication);
+    }
+
+    private CustomHttpSession getCustomHttpSession(HttpServletRequest req) {
+        Object attribute = req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY);
+        if (attribute instanceof CustomHttpSession session) {
+            return session;
+        }
+        throw new InvalidSessionException("The session is null or has wrong type");
     }
 
     private static boolean isNotAuthenticated(Authentication auth) {
@@ -69,5 +88,9 @@ public class AuthenticationFilter extends HttpFilter {
     private void authenticateUser(String username, String password) {
         var authenticationToken = authenticationService.authenticate(username, password);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+    }
+
+    private void saveAuthenticationToSession(HttpServletRequest req) {
+        getCustomHttpSession(req).setAuthentication(SecurityContextHolder.getContext().getAuthentication());
     }
 }

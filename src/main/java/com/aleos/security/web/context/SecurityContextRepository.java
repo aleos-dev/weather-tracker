@@ -13,6 +13,4 @@ public interface SecurityContextRepository {
         Supplier<SecurityContext> supplier = () -> loadContext(req);
         return SingletonSupplier.of(supplier);
     }
-
-    void saveContext(SecurityContext context, HttpServletRequest req);
 }

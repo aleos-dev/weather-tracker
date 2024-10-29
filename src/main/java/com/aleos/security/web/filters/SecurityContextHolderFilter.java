@@ -20,8 +20,13 @@ public class SecurityContextHolderFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        Supplier<SecurityContext> contextSupplier = securityContextRepository.loadDeferredContext(req);
-        SecurityContextHolder.setDeferredContext(contextSupplier);
-        chain.doFilter(req, res);
+        try {
+            Supplier<SecurityContext> contextSupplier = securityContextRepository.loadDeferredContext(req);
+            SecurityContextHolder.setDeferredContext(contextSupplier);
+            chain.doFilter(req, res);
+        } finally {
+
+            SecurityContextHolder.clearContext();
+        }
     }
 }

@@ -1,5 +1,8 @@
 package com.aleos.http;
 
+import com.aleos.security.core.Authentication;
+
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -20,6 +23,10 @@ public interface CustomHttpSession {
         String getOriginalRequest();
 
         void setOriginalRequest(String originalRequest);
+
+        Optional<Authentication> getAuthentication();
+
+        void setAuthentication(Authentication authentication);
 
         boolean isAuthenticated();
 
