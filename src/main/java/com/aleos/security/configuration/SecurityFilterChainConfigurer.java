@@ -24,12 +24,12 @@ public class SecurityFilterChainConfigurer {
         if (isEnabled) {
             return addFilter(filter);
         }
-
         return this;
     }
 
     public SecurityFilterChainConfigurer setPattern(String pattern) {
         this.pattern = pattern;
+
         return this;
     }
 

@@ -35,6 +35,7 @@ public class EmailService {
             message.setText("Click the link below to verify your account:\n" + verificationUrl);
 
             Transport.send(message);
+            logger.info("Verification email sent to {}", toEmail);
         } catch (MessagingException ex) {
             throw new EmailServiceException("Failed to send email", ex);
         }

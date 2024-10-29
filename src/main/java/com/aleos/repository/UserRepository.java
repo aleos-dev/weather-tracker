@@ -41,11 +41,11 @@ public class UserRepository extends CrudDao<User> {
 
     }
 
-    public void removeLocation(String username, Location location) {
+    public void removeLocationByCoordinates(String username, Location.Coordinates coordinates) {
         runWithinTx(em -> {
 
             var user = findByUsername(username, em);
-            user.ifPresent(u -> u.removeLocation(location));
+            user.ifPresent(u -> u.removeLocationByCoordinates(coordinates));
         });
     }
 

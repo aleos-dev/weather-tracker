@@ -1,9 +1,9 @@
 package com.aleos.servlet.filter;
 
-import com.aleos.context.Properties;
+import com.aleos.exception.WeatherClientException;
 import com.aleos.exception.repository.UniqueConstraintViolationException;
 import com.aleos.exception.security.ResourceNotFoundException;
-import com.aleos.model.ErrorData;
+import com.aleos.model.ErrorDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
@@ -14,28 +14,37 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+import static com.aleos.servlet.AbstractThymeleafServlet.ERROR_ATTRIBUTE_KEY;
+
 public class GlobalExceptionHandler extends HttpFilter {
 
-    public static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    public static final String ERROR_PAGE_URL = Properties.get("error.url").orElseThrow();
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         try {
             chain.doFilter(req, res);
+
         } catch (UniqueConstraintViolationException e) {
-            logger.debug("Unique constrain violation: ", e);
-            req.setAttribute("errorData", ErrorData.fromSingleError(e.getMessage()));
-            req.getRequestDispatcher(req.getRequestURI()).forward(req, res);
+            handleSpecificException(req, res, e, "Unique constraint violation.");
+        } catch (WeatherClientException e) {
+            handleSpecificException(req, res, e, "Weather client exception");
         } catch (ResourceNotFoundException e) {
-            logger.debug("Resource not found: {}", e.getMessage());
-            res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            logger.warn("Resource not found.", e);
+            res.sendError(404);
         } catch (Exception e) {
-            logger.debug("Unknown error", e);
-            req.setAttribute("errorData", "Unknown error");
-            req.getRequestDispatcher(ERROR_PAGE_URL).forward(req, res);
+            logger.warn("Global exception occurred.", e);
+            res.sendError(500);
         }
     }
-}
 
+    private void handleSpecificException(HttpServletRequest req, HttpServletResponse res, Exception e, String logMessage) throws ServletException, IOException {
+        logger.warn(logMessage, e);
+        setErrorDetails(req, logMessage);
+        req.getRequestDispatcher(req.getRequestURI()).forward(req, res);
+    }
+
+    private void setErrorDetails(HttpServletRequest req, String message) {
+        req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorDetails.fromSingleError(message));
+    }
+}

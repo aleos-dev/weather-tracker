@@ -18,6 +18,7 @@ import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
 @RequiredArgsConstructor
@@ -25,20 +26,15 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OpenWeatherApiClient.class);
 
-    private static final String API_KEY = System.getenv("OPEN_WEATHER_API_KEY");
-
+    private static final String API_KEY = validateApiKey();
     private static final String METRIC_SYSTEM = Properties.get("weather.api.units").orElse("metric");
-
-    private static final String NAME_FORMAT = "%s - %s";
-
     private static final int API_RESPONSE_LIMIT = Integer.parseInt(Properties.get("weather.api.response.limit").orElse("8"));
 
+    private static final String NAME_FORMAT = "%s - %s";
     private static final String OPEN_WEATHER_URL_FORMAT = "https://api.openweathermap.org/data/2.5/weather?lat=%s&lon=%s&appid=%s&units=%s";
-
     private static final String GEOCODING_URL_FORMAT = "https://api.openweathermap.org/geo/1.0/direct?q=%s&limit=%d&appid=%s";
 
     private final HttpClient httpClient;
-
     private final ObjectMapper objectMapper;
 
     @Override
@@ -62,22 +58,21 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
         HttpResponse<String> response = getStringHttpResponse(locationRequest);
 
-        WeatherApiResponse weatherResponse = new WeatherApiResponse();
-
-        if (response.statusCode() == SC_OK) {
-
-            try {
-                weatherResponse = objectMapper.readValue(response.body(), WeatherApiResponse.class);
-                weatherResponse.setDataAvailable(true);
-            } catch (JsonProcessingException e) {
-                logger.error(e.getMessage(), e);
-                throw new WeatherClientException("JsonProcessingException");
-            }
-        }
-
-        return weatherResponse;
+        return response.statusCode() == SC_OK
+                ? parseWeatherResponse(response.body())
+                : new WeatherApiResponse();
     }
 
+    private WeatherApiResponse parseWeatherResponse(String responseBody) {
+        try {
+            WeatherApiResponse weatherResponse = objectMapper.readValue(responseBody, WeatherApiResponse.class);
+            weatherResponse.setDataAvailable(true);
+            return weatherResponse;
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to parse weather data", e);
+            throw new WeatherClientException("Failed to parse weather data");
+        }
+    }
 
     private URI createGeocodingUri(String locationName) {
         return URI.create(
@@ -93,7 +88,6 @@ public class OpenWeatherApiClient implements WeatherApiClient {
             JsonNode rootNode = objectMapper.readTree(body);
 
             List<Location> locations = new ArrayList<>();
-
             for (JsonNode node : rootNode) {
 
                 String name = extractName(node);
@@ -104,16 +98,16 @@ public class OpenWeatherApiClient implements WeatherApiClient {
             }
 
             return locations;
+
         } catch (JsonProcessingException e) {
-            logger.error(e.getMessage(), e);
-            throw new WeatherClientException("JsonProcessingException");
+            logger.error("Failed to parse location data", e);
+            throw new WeatherClientException("Failed to parse location data");
         }
     }
 
     private HttpResponse<String> getStringHttpResponse(HttpRequest geocodingRequest) {
         try {
             var response = httpClient.send(geocodingRequest, HttpResponse.BodyHandlers.ofString());
-
             return checkResponse(response);
 
         } catch (IOException e) {
@@ -126,17 +120,14 @@ public class OpenWeatherApiClient implements WeatherApiClient {
         }
     }
 
-    private static HttpResponse<String> checkResponse(HttpResponse<String> response) {
+    private HttpResponse<String> checkResponse(HttpResponse<String> response) {
         return switch (response.statusCode()) {
-            case 200 -> response;
-            case 404 -> {
-                logger.debug("Location not found");
-                throw new WeatherClientException("Location not found");
-            }
-            default -> {
-                logger.debug("Failed to fetch weather data. Status Code %d".formatted(response.statusCode()));
-                throw new WeatherClientException("Failed to fetch weather data: Status Code " + response.statusCode());
-            }
+
+            case SC_OK -> response;
+            case SC_NOT_FOUND -> throw new WeatherClientException("Location not found. 404");
+
+            default ->
+                    throw new WeatherClientException("Failed to fetch weather data: Status Code " + response.statusCode());
         };
     }
 
@@ -154,5 +145,13 @@ public class OpenWeatherApiClient implements WeatherApiClient {
         return stateNode != null
                 ? String.join(", ", country, stateNode.asText())
                 : country;
+    }
+
+    private static String validateApiKey() {
+        String apiKey = System.getenv("OPEN_WEATHER_API_KEY");
+        if (apiKey == null || apiKey.isEmpty()) {
+            throw new IllegalStateException("API key for OpenWeatherMap is not set");
+        }
+        return apiKey;
     }
 }

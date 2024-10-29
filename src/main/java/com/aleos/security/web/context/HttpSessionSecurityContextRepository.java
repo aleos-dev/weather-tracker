@@ -22,7 +22,7 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 
         SecurityContext context = readSecurityContextFromSession(customHttpSession);
         if (context == null) {
-            logger.debug("No existing security context found, creating a new one.");
+            logger.debug("No existing security context found,3 creating a new one.");
             context = createNewContext();
             saveContext(context, req);
         }

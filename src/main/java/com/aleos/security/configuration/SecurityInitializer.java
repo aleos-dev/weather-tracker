@@ -50,6 +50,7 @@ public final class SecurityInitializer {
         authorizationRules.put(baseUrl, List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/css", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
         authorizationRules.put("/resources", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
+        authorizationRules.put("/favicon.ico", List.of(Role.ANONYMOUS, Role.USER, Role.ADMIN));
 
         authorizationRules.put("/api/v1/locations", List.of(Role.USER, Role.ADMIN));
 

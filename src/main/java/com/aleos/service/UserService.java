@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @AllArgsConstructor
 public class UserService implements AuthenticationService, VerificationService, RegistrationService {
+
+    public static final long TOKEN_EXPIRATION_TIME = 3600;
 
     private final UserRepository userRepository;
 
@@ -56,6 +57,10 @@ public class UserService implements AuthenticationService, VerificationService, 
         userRepository.updateUserLocationByUserName(username, location);
     }
 
+    public void removeLocationForUser(String username, double lon, double lat) {
+        var coordinates = new Location.Coordinates(lon, lat);
+        userRepository.removeLocationByCoordinates(username, coordinates);
+    }
 
     @Override
     public Authentication authenticate(String username, String password) throws AuthenticationException {
@@ -64,7 +69,7 @@ public class UserService implements AuthenticationService, VerificationService, 
 
         if (passwordEncoder.matches(password, user.getPassword())) {
             if (user.isVerified()) {
-                return new AuthenticationToken(username, password, new SimpleGrantedAuthority(Role.USER));
+                return new AuthenticationToken(username, new SimpleGrantedAuthority(Role.USER));
             }
             throw new AuthenticationException("The user is not verified. Check your email for further instructions.");
         }
@@ -102,16 +107,13 @@ public class UserService implements AuthenticationService, VerificationService, 
     }
 
     private Instant retrieveTokenExpiration() {
-        long defaultExpirationTime = 3600;
         Optional<String> value = Properties.get("registration.token.expiration.seconds");
-
         try {
             return Instant.now().plusSeconds(
-                    value.map(Long::parseLong).orElse(defaultExpirationTime)
+                    value.map(Long::parseLong).orElse(TOKEN_EXPIRATION_TIME)
             );
         } catch (DateTimeParseException | NumberFormatException e) {
-            return Instant.now().plusSeconds(defaultExpirationTime);
+            return Instant.now().plusSeconds(TOKEN_EXPIRATION_TIME);
         }
     }
-
 }

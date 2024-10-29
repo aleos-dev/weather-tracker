@@ -6,19 +6,19 @@ import lombok.RequiredArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 @RequiredArgsConstructor
-public class ErrorData {
+public class ErrorDetails {
 
-    @Getter
     private final List<String> errors;
 
-    public static ErrorData fromSingleError(String message) {
+    public static ErrorDetails fromSingleError(String message) {
         List<String> errorList = new ArrayList<>();
         errorList.add(message);
         return fromErrorList(errorList);
     }
 
-    public static ErrorData fromErrorList(List<String> errorDetails) {
-        return new ErrorData(errorDetails);
+    public static ErrorDetails fromErrorList(List<String> errorDetails) {
+        return new ErrorDetails(errorDetails);
     }
 }

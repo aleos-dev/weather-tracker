@@ -19,12 +19,10 @@ public class UserLocationId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_user_location"))
-//    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "location_id", foreignKey = @ForeignKey(name = "fk_location_user_location"))
-//    @JoinColumn(name = "location_id")
     private Location location;
 
     @Override

@@ -31,7 +31,6 @@ public class DefaultSecurityFilterChain implements SecurityFilterChain {
             customChain.doFilter(request, response);
     }
 
-
     @Override
     public String toString() {
         return "DefaultSecurityFilterChain{" +
