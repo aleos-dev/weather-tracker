@@ -9,7 +9,7 @@ import com.aleos.exception.service.ParseDtoException;
 import com.aleos.exception.servlet.RedirectException;
 import com.aleos.exception.servlet.ResponseWritingException;
 import com.aleos.http.CustomHttpSession;
-import com.aleos.model.ErrorData;
+import com.aleos.model.ErrorDetails;
 import com.aleos.model.annotation.RequestParam;
 import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContext;
@@ -36,12 +36,12 @@ import java.util.Set;
 public class AbstractThymeleafServlet extends HttpServlet {
     public static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractThymeleafServlet.class);
 
-    protected static final String DEFAULT_WELCOME_URI = Properties.get("base.url").orElse("/api/v1/welcome");
-    protected static final String DEFAULT_WEATHER_URI = Properties.get("base.auth.url").orElse("/api/v1/weather");
-    protected static final String DEFAULT_AUTH_URI = Properties.get("auth.url").orElse("/api/v1/sign-in");
+    public static final String ERROR_ATTRIBUTE_KEY = "errors";
+    public static final String MESSAGE_ATTRIBUTE_KEY = "message";
 
-    protected static final String ERROR_ATTRIBUTE_KEY = "errors";
-    protected static final String MESSAGE_ATTRIBUTE_KEY = "message";
+    protected static final String WELCOME_URI = Properties.get("base.url").orElse("/api/v1/welcome");
+    protected static final String WEATHER_URI = Properties.get("base.auth.url").orElse("/api/v1/weather");
+    protected static final String AUTH_URI = Properties.get("auth.url").orElse("/api/v1/sign-in");
 
     protected transient ITemplateEngine templateEngine;
     protected transient ServiceLocator serviceLocator;
@@ -76,22 +76,22 @@ public class AbstractThymeleafServlet extends HttpServlet {
                     }
                     RequestParam annotation = field.getAnnotation(RequestParam.class);
                     String paramName = annotation != null ? annotation.value() : field.getName();
-                    return req.getParameter(paramName);
+                    var pVal = req.getParameter(paramName);
+                    return pVal != null ? pVal.trim() : null;
                 })
                 .toArray();
 
         return (T) createObject(dtoConstructor, args);
     }
 
-    protected <T> Optional<ErrorData> validatePayload(Validator payloadValidator, T inputPayload) {
+    protected <T> Optional<ErrorDetails> validatePayload(Validator payloadValidator, T inputPayload) {
         Set<ConstraintViolation<T>> constraintViolations = payloadValidator.validate(inputPayload);
-
         if (constraintViolations.isEmpty()) {
             return Optional.empty();
         }
 
         return Optional.of(
-                new ErrorData(
+                new ErrorDetails(
                         constraintViolations.stream()
                                 .map(this::formatConstraintViolation)
                                 .toList()
@@ -107,7 +107,7 @@ public class AbstractThymeleafServlet extends HttpServlet {
     }
 
     protected void renderErrorPage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
-        req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorData.fromSingleError(errorMessage));
+        req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorDetails.fromSingleError(errorMessage));
         processTemplate("errorPage", req, res);
     }
 
