@@ -6,8 +6,6 @@ public interface Authentication {
 
     String getPrincipal();
 
-    String getCredential();
-
     List<GrantedAuthority> getAuthorities();
 
     boolean isAuthenticated();

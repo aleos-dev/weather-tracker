@@ -7,6 +7,7 @@ import com.aleos.security.core.Authentication;
 import com.aleos.security.core.GrantedAuthority;
 import com.aleos.security.core.Role;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
@@ -16,7 +17,7 @@ import java.util.function.Supplier;
 
 public class AuthorizationManager {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(AuthorizationManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorizationManager.class);
 
     private final Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
 
