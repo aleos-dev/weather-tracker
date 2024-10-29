@@ -2,45 +2,48 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{/fragment/head :: head ('Sign Up')}"></head>
-<link rel="stylesheet" th:href="@{/css/registration.css}">
+<link rel="stylesheet" th:href="@{/css/auth.css}">
 
 <body>
-<div class="container">
+<div class="content-wrapper d-flex flex-column min-vh-100">
+
     <div th:replace="~{/fragment/header :: simple-header}"></div>
 
-    <h2>Sign Up</h2>
+    <div class="container flex-grow-1">
 
-    <div th:replace="~{/fragment/messages :: displayMessage}"></div>
+        <h2>Sign Up</h2>
+        <div th:replace="~{/fragment/messages :: displayMessage}"></div>
 
-    <div th:if="${message == null}">
-        <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
+        <div th:if="${message == null}">
+            <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-        <form th:action="@{~/api/v1/sign-up}" method="post" id="signUpForm">
-            <div>
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div>
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div>
-                <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-            </div>
-            <div>
-                <button type="submit">Submit</button>
-            </div>
-        </form>
+            <form th:action="@{~/api/v1/sign-up}" method="post" id="signUpForm">
+                <div>
+                    <label for="name">Name:</label>
+                    <input type="text" th:value="${name}" id="name" name="name" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" th:value="${email}" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div>
+                    <label for="confirmPassword">Confirm Password:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                </div>
+                <div>
+                    <button type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    <div th:replace="~{/fragment/footer :: footer}"></div>
 </div>
 
 <script src="/resources/js/password-validation.js"></script>
-
-<div th:replace="~{/fragment/footer :: footer}"></div>
 </body>
 </html>

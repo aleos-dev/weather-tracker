@@ -1,13 +1,13 @@
 <!-- Fragment for displaying a common message -->
 <div th:fragment="displayMessage">
-    <div th:if="${message != null}" class="message">
+    <div th:if="${message != null}" class="message bg-primary-subtle">
         <span th:text="${message}"></span>
     </div>
 </div>
 
 <!-- Fragment for displaying error messages -->
 <div th:fragment="displayErrorMessage">
-    <div th:if="${errors != null}" class="error-message">
+    <div th:if="${errors != null}" class="error-message bg-warning">
         <ul>
             <li th:each="error : ${errors.errors}" th:text="${error}"></li>
         </ul>

@@ -14,15 +14,26 @@
                 <input type="hidden" name="lat" th:value="${location.coordinates.lon}">
                 <input type="hidden" name="lon" th:value="${location.coordinates.lat}">
                 <input type="hidden" name="locationName" th:value="${location.name}">
-                <button type="submit" class="btn btn-primary">Add to bookmarks</button>
+                <button type="submit" class="btn btn-primary">Track Location</button>
             </form>
         </div>
     </div>
 </div>
 
 <div th:fragment="location-weather-card">
+
     <div class="card h-100">
+
+
         <div class="card-body" th:object="${locationWeather}">
+
+            <form th:action="@{/api/v1/locations}" method="post" class="position-absolute"
+                  style="top: -6px; right: 2px;">
+                <input type="hidden" name="_method" value="DELETE">
+                <input type="hidden" th:name="lon" th:value="*{longitude}"/>
+                <input type="hidden" th:name="lat" th:value="*{latitude}"/>
+                <button type="submit" class="btn-close" aria-label="Delete"></button>
+            </form>
 
             <h5 class="card-title" th:text="*{locationName}">locationName</h5>
 

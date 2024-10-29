@@ -4,54 +4,57 @@
 <head th:replace="~{/fragment/head :: head ('Weather tracker')}"></head>
 
 <body>
-<div th:replace="~{/fragment/header :: full-header}"></div>
+<div class="content-wrapper d-flex flex-column min-vh-100">
+    <div th:replace="~{/fragment/header :: full-header}"></div>
 
-<div th:replace="~{/fragment/messages :: displayMessage}"></div>
-<div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
+    <div th:replace="~{/fragment/messages :: displayMessage}"></div>
+    <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-<div class="weather-container" th:with="isEmptyQueries=${#lists.isEmpty(locationsByQuery)},
-                  hasQueries=${!#lists.isEmpty(locationsByQuery)},
-                  hasUserLocations=${!#lists.isEmpty(userLocationsWeather)}">
+    <div class="weather-container flex-grow-1" th:with="
+                    isQueryRequest=${userLocationsWeather == null},
+                    hasQueryLocations=${locationsByQuery != null},
+                    isUserLocationRequest=${userLocationsWeather != null},
+                    hasUserLocations=${!#lists.isEmpty(userLocationsWeather)}">
 
-    <h2 th:if="${isEmptyQueries and !hasUserLocations}">No tracked locations</h2>
-    <h2 th:if="${hasQueries}">Choose location to be tracked</h2>
-    <h2 th:if="${hasUserLocations}">Tracked Locations</h2>
+        <form th:action="@{/api/v1/locations}" method="get"
+              class="search-bar container d-flex align-content-center">
+            <input type="text" name="query" id="query" placeholder="Search locations"
+                   class="form-control ms-3 me-3 mt-3"
+                   style="flex: 1;">
 
-    <form th:action="@{/api/v1/locations}" method="get" class="d-flex align-items-center">
-        <label for="query" class="queryLabel me-2">Search locations</label>
+            <button type="submit" class="btn btn-primary me-3 mt-3">Search</button>
 
-        <input type="text" name="query" id="query" placeholder="Search locations" class="form-control me-3"
-               style="flex: 1;">
+            <div class="back-link me-3" th:if="${isQueryRequest}">
+                <a href="/api/v1/weather" class="btn btn-outline-secondary mt-3">&larr; Go Back to Tracked Locations</a>
+            </div>
+        </form>
 
-        <button type="submit" class="btn btn-primary">Search</button>
+        <h2 th:if="${isQueryRequest and !hasQueryLocations}" class="mt-3 text-md-center">No results found.</h2>
+        <h2 th:if="${isUserLocationRequest and !hasUserLocations}" class="mt-3 text-md-center">No tracked locations</h2>
 
-        <div class="back-link me-3" th:if="${!hasUserLocation}">
-            <a href="/api/v1/weather" class="btn btn-outline-secondary">&larr; Go Back to Tracked Locations</a>
+        <div class="locations-list container" th:if="${hasQueryLocations}">
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3 mt-3" th:each="location : ${locationsByQuery}">
+                <div th:insert="~{fragment/location-card :: location-search-card}"></div>
+            </div>
         </div>
-    </form>
 
-    <div class="locations-list row" th:if="${hasQueries}">
-        <div class="col-md-4 mb-3" th:each="location : ${locationsByQuery}">
-            <div th:insert="~{fragment/location-card :: location-search-card}"></div>
-        </div>
-    </div>
+        <div class="locations-list container" th:if="${hasUserLocations}">
+            <div class="col-sm-6 col-md-4 col-lg-3 mb-3 mt-3" th:each="locationWeather : ${userLocationsWeather}">
+                <div class="weather-card"
+                     th:attr="data-temp=${locationWeather.weatherDetails.temperatureInfo.currentTemp}">
+                    <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
 
-    <div class="locations-list row" th:if="${hasUserLocations}">
-        <div class="col-sm-6 col-md-4 col-lg-3 mb-3" th:each="locationWeather : ${userLocationsWeather}">
-            <div class="weather-card"
-                 th:attr="data-temp=${locationWeather.weatherDetails.temperatureInfo.currentTemp}">
-                <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
-
-                <div class="trivia-popup" style="display: none;">
-                    <p id="trivia-content">Loading trivia...</p>
+                    <div class="trivia-popup" style="display: none;">
+                        <p id="trivia-content">Loading trivia...</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div th:replace="~{/fragment/footer :: footer}"></div>
 </div>
 
 <script src="/resources/js/weather.js"></script>
-
-<div th:replace="~{/fragment/footer :: footer}"></div>
 </body>
 </html>

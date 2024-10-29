@@ -2,31 +2,37 @@
 <html lang=en xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{/fragment/head :: head ('Sign In')}"></head>
+<link rel="stylesheet" th:href="@{/css/auth.css}">
 
 <body>
-<div class="container">
+<div class="content-wrapper d-flex flex-column min-vh-100">
+
     <div th:replace="~{/fragment/header :: simple-header}"></div>
 
-    <h2>Sign-in</h2>
+    <div class="container flex-grow-1">
 
-    <div th:replace="~{/fragment/messages :: displayMessage}"></div>
-    <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
+        <h2>Sign-in</h2>
+        <div th:replace="~{/fragment/messages :: displayMessage}"></div>
+        <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
-    <form th:action="@{/api/v1/sign-in}" method="post">
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control" required>
+        <form th:action="@{/api/v1/sign-in}" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" th:value="${name}" id="username" name="name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <div>
+            <p>Don't have an account? <a th:href="@{/api/v1/sign-up}">Sign-up here</a>
         </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Login</button>
-    </form>
+    </div>
 
-    <p>Don't have an account? <a th:href="@{/api/v1/sign-up}">Sign-up here</a></p>
+    <div th:replace="~{/fragment/footer :: footer}"></div>
 </div>
-
-<div th:replace="~{/fragment/footer :: footer}"></div>
 </body>
 </html>
