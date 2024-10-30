@@ -2,7 +2,7 @@
 
 # TODO List
 
-1. Add feature to change location names.
+1. ~~Add feature to change location names.~~
 2. ~~Implement bcrypt for password encoding.~~
 3. Integrate Redis for session management.
 4. Add unit and integration tests.

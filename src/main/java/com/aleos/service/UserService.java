@@ -62,6 +62,10 @@ public class UserService implements AuthenticationService, VerificationService, 
         userRepository.removeLocationByCoordinates(username, coordinates);
     }
 
+    public void renameLocationByCoordinates(String username, double lon, double lat, String newLocationName) {
+        userRepository.renameLocationByCoordinates(username, lon, lat, newLocationName);
+    }
+
     @Override
     public Authentication authenticate(String username, String password) throws AuthenticationException {
         var user = userRepository.find(username)

@@ -21,10 +21,7 @@
 </div>
 
 <div th:fragment="location-weather-card">
-
     <div class="card h-100">
-
-
         <div class="card-body" th:object="${locationWeather}">
 
             <form th:action="@{/api/v1/locations}" method="post" class="position-absolute"
@@ -35,7 +32,24 @@
                 <button type="submit" class="btn-close" aria-label="Delete"></button>
             </form>
 
-            <h5 class="card-title" th:text="*{locationName}">locationName</h5>
+            <h5 class="card-title location-name" th:text="*{locationName}">locationName</h5>
+
+            <!-- Custom Modal Structure -->
+            <div class="modal customModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>Enter new location name</h2>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" class="locationNameInput" value="*{locationName}">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="cancelBtn btn">Cancel</button>
+                        <button class="saveLocationName btn">OK</button>
+                    </div>
+                </div>
+            </div>
 
             <div class="d-flex align-items-center mb-2">
                 <img class="card-img-top img-fluid" style="max-height: 50px; object-fit: contain;"
