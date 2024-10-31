@@ -15,12 +15,14 @@ import java.io.IOException;
 
 public class SessionFilter extends HttpFilter {
 
+    private static final String APP_RESOURCE_PREFIX = "/api/v1/";
+
     private transient SessionManager manager;
 
     @Override
     public void init(FilterConfig config) {
         var locator = (ServiceLocator) config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
-        manager = (SessionManager) locator.getBean(CustomHttpSession.class);
+        manager = locator.getBean(SessionManager.class);
     }
 
     @Override
@@ -30,6 +32,18 @@ public class SessionFilter extends HttpFilter {
 
         req.setAttribute(CustomHttpSession.SESSION_CONTEXT_KEY, session);
 
-        chain.doFilter(req, res);
+        try {
+            chain.doFilter(req, res);
+        } finally {
+
+            // lazy variant of simple dirty checking to exclude session saving for the static resources
+            if (isAppResources(req)) {
+                manager.saveSessionToRedis(session);
+            }
+        }
+    }
+
+    private boolean isAppResources(HttpServletRequest req) {
+        return req.getRequestURI().startsWith(APP_RESOURCE_PREFIX);
     }
 }
