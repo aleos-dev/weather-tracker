@@ -2,19 +2,21 @@ package com.aleos.http;
 
 import com.aleos.security.core.Authentication;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.UUID;
 
-
-public interface CustomHttpSession {
+public interface CustomHttpSession extends Serializable {
 
         String SESSION_CONTEXT_KEY = "SESSION_CONTEXT";
 
         UUID getId();
 
-        Object getAttribute(String name);
+        Serializable getAttribute(String key);
 
-        void setAttribute(String name, Object value);
+        void setAttribute(String key, Serializable value);
+
+        Serializable removeAttribute(String key);
 
         long getLastAccessedTime();
 
