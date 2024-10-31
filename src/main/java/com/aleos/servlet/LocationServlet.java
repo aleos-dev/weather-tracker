@@ -28,10 +28,14 @@ public class LocationServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        switch (req.getParameter("_method").toUpperCase()) {
-            case "DELETE" -> doDelete(req, resp);
-            case "PATCH" -> doPatch(req, resp);
-            default -> super.service(req, resp);
+        var method = req.getParameter(("_method"));
+
+        if ("DELETE".equalsIgnoreCase(method)) {
+            doDelete(req, resp);
+        } else if ("PATCH".equalsIgnoreCase(method)) {
+            doPatch(req, resp);
+        } else {
+            super.service(req, resp);
         }
     }
 
