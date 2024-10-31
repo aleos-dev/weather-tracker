@@ -1,8 +1,9 @@
 package com.aleos.security.core;
 
+import java.io.Serializable;
 import java.util.List;
 
-public interface Authentication {
+public interface Authentication extends Serializable {
 
     String getPrincipal();
 

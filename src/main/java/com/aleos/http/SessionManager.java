@@ -1,16 +1,29 @@
 package com.aleos.http;
 
 import com.aleos.context.Properties;
+import com.aleos.security.core.AuthenticationToken;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
+import static org.slf4j.LoggerFactory.*;
+
+@RequiredArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SessionManager {
+
+    private static final Logger logger = getLogger(SessionManager.class);
 
     private static final String SESSION_COOKIE_NAME = "SESSION_ID";
     private static final long SESSION_TIMEOUT_MS;
@@ -21,12 +34,12 @@ public class SessionManager {
         APP_CONTEXT = Properties.get("app.context").orElse("/");
     }
 
-    private final Map<UUID, CustomHttpSession> sessions = new ConcurrentHashMap<>();
+    private final JedisPool jedisPool;
+    private final ObjectMapper objectMapper;
 
     public CustomHttpSession createSession(HttpServletResponse res) {
         UUID sessionId = generateSessionId();
         CustomHttpSession session = new CustomHttpSessionImpl(sessionId);
-        sessions.put(sessionId, session);
 
         createSessionIdCookie(res, sessionId);
 
@@ -35,28 +48,48 @@ public class SessionManager {
 
     public Optional<CustomHttpSession> getValidSession(HttpServletRequest req, HttpServletResponse res) {
         return getSessionIdFromCookie(req).flatMap(sessionId -> {
-                    CustomHttpSession session = sessions.get(sessionId);
 
-                    if (session == null) {
-                        invalidateSessionCookie(res);
+            CustomHttpSession session = getSession(sessionId);
 
-                    } else {
+            if (session == null) {
+                invalidateSessionCookie(res);
 
-                        if (isSessionValid(session)) {
-                            updateLastAccessedTime(session);
+            } else {
 
-                        } else {
-                            removeSession(sessionId);
-                            invalidateSessionCookie(res);
-                        }
-                    }
+                if (isSessionValid(session)) {
+                    updateLastAccessedTime(session);
 
-                    return Optional.ofNullable(session);
-                });
+                } else {
+                    removeSession(sessionId);
+                    invalidateSessionCookie(res);
+                }
+            }
+
+            return Optional.ofNullable(session);
+        });
+    }
+
+    public void saveSessionToRedis(CustomHttpSession session) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            serializeSession(session).ifPresent(sessionData ->
+                    jedis.setex(session.getId().toString(), SESSION_TIMEOUT_MS / 1000, sessionData));
+        }
+    }
+
+    public CustomHttpSession getSession(UUID sessionId) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            String sessionData = jedis.get(sessionId.toString());
+
+            return sessionData == null
+                    ? null
+                    : deserializeSession(sessionData);
+        }
     }
 
     public void removeSession(UUID sessionId) {
-        sessions.remove(sessionId);
+        try (Jedis jedis = jedisPool.getResource()) {
+            jedis.del(sessionId.toString());
+        }
     }
 
     private void createSessionIdCookie(HttpServletResponse res, UUID sessionId) {
@@ -109,5 +142,32 @@ public class SessionManager {
 
     private void updateLastAccessedTime(CustomHttpSession session) {
         session.setLastAccessedTime(System.currentTimeMillis());
+    }
+
+    private Optional<String> serializeSession(CustomHttpSession session) {
+        try {
+            return Optional.of(objectMapper.writeValueAsString(session));
+        } catch (JsonProcessingException e) {
+            logger.error("Session serialization error: ", e);
+            return Optional.empty();
+        }
+    }
+
+    private CustomHttpSession deserializeSession(String sessionData) {
+        try {
+            var session = objectMapper.readValue(sessionData, CustomHttpSessionImpl.class);
+
+            Optional.ofNullable(session.getAttribute("AUTHENTICATION"))
+                    .filter(LinkedHashMap.class::isInstance)
+                    .map(auth -> objectMapper.convertValue(auth, AuthenticationToken.class))
+                    .ifPresentOrElse(
+                            session::setAuthentication,
+                            () -> session.removeAttribute(CustomHttpSessionImpl.AUTH_SESSION_KEY));
+
+            return session;
+        } catch (JsonProcessingException e) {
+            logger.error("Session deserialization error: ", e);
+            return null;
+        }
     }
 }

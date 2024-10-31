@@ -13,6 +13,7 @@ import com.aleos.security.web.context.HttpSessionSecurityContextRepository;
 import com.aleos.security.web.context.SecurityContextRepository;
 import com.aleos.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import jakarta.validation.Validation;
@@ -21,6 +22,8 @@ import jakarta.validation.ValidatorFactory;
 import org.flywaydb.core.Flyway;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import java.net.http.HttpClient;
 import java.util.HashMap;
@@ -58,8 +61,18 @@ public class ApplicationContextConfiguration {
     }
 
     @Bean
-    public SessionManager customHttpSession() {
-        return new SessionManager();
+    public JedisPool jedisPool() {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(20);
+        poolConfig.setMaxIdle(5);
+        poolConfig.setMinIdle(1);
+
+        return new JedisPool(poolConfig, "localhost", 6379);
+    }
+
+    @Bean
+    public SessionManager sessionManager(JedisPool jedisPool, ObjectMapper objectMapper) {
+        return new SessionManager(jedisPool, objectMapper);
     }
 
     // Services
@@ -104,7 +117,6 @@ public class ApplicationContextConfiguration {
 
     // Repositories
 
-
     @Bean
     public VerificationTokenDao verificationTokenDao(EntityManagerFactory entityManagerFactory) {
         return new VerificationTokenDao(entityManagerFactory, UserVerificationToken.class);
@@ -143,7 +155,10 @@ public class ApplicationContextConfiguration {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        var objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new Jdk8Module());  // Register JDK8 module to handle Optional
+
+        return objectMapper;
     }
 
     private Map<String, String> loadHibernateProperties() {

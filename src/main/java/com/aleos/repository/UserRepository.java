@@ -2,6 +2,7 @@ package com.aleos.repository;
 
 import com.aleos.model.entity.Location;
 import com.aleos.model.entity.User;
+import com.aleos.model.entity.UserLocation;
 import com.aleos.model.entity.UserVerificationToken;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -49,6 +50,25 @@ public class UserRepository extends CrudDao<User> {
         });
     }
 
+    public void renameLocationByCoordinates(String username, double lon, double lat, String newLocationName) {
+        String jpql = """
+                FROM UserLocation ul
+                WHERE ul.userLocationId.user.username = :username
+                AND ul.userLocationId.location.coordinates.lon = :lon
+                AND ul.userLocationId.location.coordinates.lat = :lat
+                """;
+
+        runWithinTx(em -> {
+            var userLocation = em.createQuery(jpql, UserLocation.class)
+                    .setParameter("username", username)
+                    .setParameter("lon", lon)
+                    .setParameter("lat", lat)
+                    .getSingleResult();
+
+            userLocation.setLocationName(newLocationName);
+        });
+    }
+
     public List<Object[]> fetchUserLocationData(String username) {
         String sql = """
                  SELECT l.longitude, l.latitude,
@@ -89,5 +109,4 @@ public class UserRepository extends CrudDao<User> {
         return Optional.ofNullable(em.unwrap(Session.class).bySimpleNaturalId(User.class)
                 .load(username));
     }
-
 }

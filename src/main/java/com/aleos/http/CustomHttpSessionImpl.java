@@ -1,19 +1,29 @@
 package com.aleos.http;
 
 import com.aleos.security.core.Authentication;
+import com.aleos.security.core.AuthenticationToken;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+@JsonIgnoreProperties({"authentication", "authenticated", "principal"})
 public class CustomHttpSessionImpl implements CustomHttpSession {
 
-    private static final String AUTH_SESSION_KEY = "AUTHENTICATION";
+    public static final String AUTH_SESSION_KEY = "AUTHENTICATION";
 
-    private final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<>();
+    @JsonProperty
+    private final ConcurrentMap<String, Serializable> attributes = new ConcurrentHashMap<>();
 
     @Getter
     private final UUID id;
@@ -26,29 +36,40 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     @Setter
     private String originalRequest;
 
-    public CustomHttpSessionImpl(UUID id) {
+    @JsonCreator
+    public CustomHttpSessionImpl(@JsonProperty("id") UUID id) {
         this.id = id;
         lastAccessedTime = System.currentTimeMillis();
     }
 
     @Override
-    public Object getAttribute(String name) {
-        return attributes.get(name);
+    public Serializable getAttribute(String key) {
+        return attributes.get(key);
     }
 
     @Override
-    public void setAttribute(String name, Object value) {
-        attributes.put(name, value);
+    public void setAttribute(String key, Serializable value) {
+        attributes.put(key, value);
+    }
+
+    @Override
+    public Serializable removeAttribute(String key) {
+        return attributes.remove(key);
     }
 
     @Override
     public Optional<Authentication> getAuthentication() {
-        return Optional.ofNullable((Authentication) attributes.get(AUTH_SESSION_KEY));
+        Serializable auth = attributes.get(AUTH_SESSION_KEY);
+        return auth == null
+                ? Optional.empty()
+                : Optional.of((Authentication) auth);
     }
 
     @Override
     public void setAuthentication(Authentication auth) {
-        attributes.put(AUTH_SESSION_KEY, auth);
+        if (auth != null) {
+            attributes.put(AUTH_SESSION_KEY, auth);
+        }
     }
 
     @Override

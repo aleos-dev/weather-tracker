@@ -4,14 +4,15 @@ import com.aleos.service.UserService;
 import com.aleos.service.WeatherApiClient;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Optional;
 
+@MultipartConfig
 @WebServlet("/api/v1/locations")
 public class LocationServlet extends AbstractThymeleafServlet {
 
@@ -27,11 +28,15 @@ public class LocationServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (Objects.equals(req.getParameter("_method"), "DELETE")) {
+        var method = req.getParameter(("_method"));
+
+        if ("DELETE".equalsIgnoreCase(method)) {
             doDelete(req, resp);
-            return;
+        } else if ("PATCH".equalsIgnoreCase(method)) {
+            doPatch(req, resp);
+        } else {
+            super.service(req, resp);
         }
-        super.service(req, resp);
     }
 
     @Override
@@ -62,16 +67,25 @@ public class LocationServlet extends AbstractThymeleafServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse res) {
-        String username = retrieveAuthenticationPrincipal(req);
-
-        var lon = parseCoordinate("lon", req);
-        var lat = parseCoordinate("lat", req);
-
-        userService.removeLocationForUser(username, lon, lat);
+        userService.removeLocationForUser(
+                retrieveAuthenticationPrincipal(req),
+                parseCoordinate("lon", req),
+                parseCoordinate("lat", req)
+        );
 
         sendRedirect("/api/v1/weather", res);
     }
 
+    private void doPatch(HttpServletRequest req, HttpServletResponse res) {
+        userService.renameLocationByCoordinates(
+                retrieveAuthenticationPrincipal(req),
+                parseCoordinate("lon", req),
+                parseCoordinate("lat", req),
+                req.getParameter("locationName")
+        );
+
+        res.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
 
     private double parseCoordinate(String key, HttpServletRequest req) {
         try {
