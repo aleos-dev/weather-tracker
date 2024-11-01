@@ -1,29 +1,28 @@
 package com.aleos.service;
 
+import com.aleos.context.Properties;
 import com.aleos.exception.service.EmailServiceException;
 import jakarta.mail.*;
-import jakarta.mail.internet.*;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 
-import java.util.Properties;
 
 public class EmailService {
     public static final Logger logger = org.slf4j.LoggerFactory.getLogger(EmailService.class);
 
-    private static final String SENDER_EMAIL = System.getenv("weather_tracker_mail_service_sender");
-    private static final String EMAIL_SERVICE_CODE = System.getenv("weather_tracker_mail_service_code");
+    private static final String SENDER_EMAIL = "WEATHER_TRACKER_MAIL_SERVICE_SENDER";
+    private static final String EMAIL_SERVICE_CODE = "WEATHER_TRACKER_MAIL_SERVICE_CODE";
 
     public void sendVerificationEmail(String toEmail, String verificationUrl) {
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host", "smtp.gmail.com"); // SMTP host for Gmail
-        properties.put("mail.smtp.port", "587"); // TLS port
-        properties.put("mail.smtp.auth", "true");
-        properties.put("mail.smtp.starttls.enable", "true"); // Enable STARTTLS for secure connection
+        var properties = initializeEmailProperties();
 
         Session session = Session.getInstance(properties, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(SENDER_EMAIL, EMAIL_SERVICE_CODE);
+                return new PasswordAuthentication(
+                        Properties.get(SENDER_EMAIL).orElseThrow(),
+                        Properties.get(EMAIL_SERVICE_CODE).orElseThrow());
             }
         });
 
@@ -39,5 +38,14 @@ public class EmailService {
         } catch (MessagingException ex) {
             throw new EmailServiceException("Failed to send email", ex);
         }
+    }
+
+    private static java.util.Properties initializeEmailProperties() {
+        java.util.Properties properties = new java.util.Properties();
+        properties.put("mail.smtp.host", "smtp.gmail.com"); // SMTP host for Gmail
+        properties.put("mail.smtp.port", "587"); // TLS port
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.starttls.enable", "true"); // Enable STARTTLS for secure connection
+        return properties;
     }
 }
