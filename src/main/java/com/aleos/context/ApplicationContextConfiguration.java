@@ -55,10 +55,12 @@ public class ApplicationContextConfiguration {
     @Bean
     public Flyway flyway() {
         return Flyway.configure().dataSource(
-                Properties.get(DB_URL_ENV).orElseThrow(),
-                Properties.get(DB_USER_ENV).orElseThrow(),
-                Properties.get(DB_PASSWORD_ENV).orElseThrow()
-        ).load();
+                        Properties.get(DB_URL_ENV).orElseThrow(),
+                        Properties.get(DB_USER_ENV).orElseThrow(),
+                        Properties.get(DB_PASSWORD_ENV).orElseThrow()
+                )
+                .cleanDisabled(Boolean.parseBoolean(Properties.get("flyway.cleanDisabled").orElse("true")))
+                .load();
     }
 
     @Bean
