@@ -4,6 +4,7 @@ import com.aleos.context.ApplicationContextConfiguration;
 import com.aleos.context.servicelocator.BeanFactory;
 import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.persistence.EntityManagerFactory;
+import lombok.Getter;
 import org.junit.platform.launcher.TestExecutionListener;
 import org.junit.platform.launcher.TestPlan;
 import org.slf4j.Logger;
@@ -16,30 +17,32 @@ public class TestContextInitializer implements TestExecutionListener {
 
     private static final Logger logger = getLogger(TestContextInitializer.class);
 
+    @Getter
     private static ServiceLocator serviceLocator;
 
     @Container
     private static PostgreSQLContainer<?> postgresContainer;
 
-    @Override
-    public void testPlanExecutionStarted(TestPlan testPlan) {
-        postgresContainer = new PostgreSQLContainer<>("postgres:16")
-                .withDatabaseName("testdb")
-                .withUsername("testuser")
-                .withPassword("testpassword");
+    static {
+        try {
+            postgresContainer = new PostgreSQLContainer<>("postgres:16")
+                    .withDatabaseName("testdb")
+                    .withUsername("testuser")
+                    .withPassword("testpassword");
 
-        postgresContainer.start();
+            postgresContainer.start();
+            logger.info("Postgres container started with database: {}, username: {}", postgresContainer.getDatabaseName(), postgresContainer.getUsername());
 
-        logger.info("Postgres container started with database: {}, username: {}", postgresContainer.getDatabaseName(), postgresContainer.getUsername());
+            System.setProperty("DB_URL", postgresContainer.getJdbcUrl());
+            System.setProperty("DB_USER", postgresContainer.getUsername());
+            System.setProperty("DB_PASSWORD", postgresContainer.getPassword());
 
-        System.setProperty("DB_URL", postgresContainer.getJdbcUrl());
-        System.setProperty("DB_USER", postgresContainer.getUsername());
-        System.setProperty("DB_PASSWORD", postgresContainer.getPassword());
-
-
-        serviceLocator = new BeanFactory(ApplicationContextConfiguration.class);
-
-        logger.info("Test ApplicationContext initialized successfully.");
+            serviceLocator = new BeanFactory(ApplicationContextConfiguration.class);
+            logger.info("Test ApplicationContext initialized successfully.");
+        } catch (Exception e) {
+            logger.error("Test ApplicationContext failed to start", e);
+            System.exit(1);
+        }
     }
 
     @Override
@@ -48,12 +51,8 @@ public class TestContextInitializer implements TestExecutionListener {
         shutdownPostgresContainer();
     }
 
-    public static <T> T getBean(Class<T> contextKey) {
-        return serviceLocator.getBean(contextKey);
-    }
-
-    public static ServiceLocator getServiceLocator() {
-        return serviceLocator;
+    public static <T> T getBean(Class<T> clazz) {
+        return serviceLocator.getBean(clazz);
     }
 
     private static void closeEntityManagerFactory() {
