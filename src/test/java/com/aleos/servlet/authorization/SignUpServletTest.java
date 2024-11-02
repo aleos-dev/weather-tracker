@@ -8,6 +8,8 @@ import com.aleos.service.EmailService;
 import com.aleos.service.RegistrationService;
 import com.aleos.servlet.AbstractTestServlet;
 import jakarta.validation.Validator;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,12 @@ class SignUpServletTest extends AbstractTestServlet {
     @BeforeAll
     static void beforeAll() {
         initializeDependencies();
+        TestContextInitializer.getBean(Flyway.class).migrate();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        TestContextInitializer.getBean(Flyway.class).clean();
     }
 
     @BeforeEach

@@ -8,6 +8,8 @@ import com.aleos.repository.UserRepository;
 import com.aleos.service.UserService;
 import com.aleos.service.WeatherApiClient;
 import com.aleos.util.ReflectionUtil;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,18 +36,24 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class LocationServletTest extends AbstractTestServlet {
 
+    private static final UserRepository USER_REPOSITORY = TestContextInitializer.getBean(UserRepository.class);
+
     private static LocationServlet realServlet;
     private static LocationServlet spyServlet;
-
-    private static UserRepository userRepository = TestContextInitializer.getBean(UserRepository.class);
 
     private static final String LOCATION_NAME = "Kyiv - UA";
     private static final String LONGITUDE = "50.4500336";
     private static final String LATITUDE = "30.5241361";
 
     @BeforeAll
-    static void setupOnce() {
+    static void beforeAll() {
         initializeDependencies();
+        TestContextInitializer.getBean(Flyway.class).migrate();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        TestContextInitializer.getBean(Flyway.class).clean();
     }
 
     @BeforeEach
@@ -226,7 +234,7 @@ class LocationServletTest extends AbstractTestServlet {
     }
 
     private void assertLocationSaved(String username, double longitude, double latitude) {
-        boolean isLocationSaved = userRepository.fetchUserLocationData(username).stream()
+        boolean isLocationSaved = USER_REPOSITORY.fetchUserLocationData(username).stream()
                 .map(this::mapRowToLocation)
                 .anyMatch(loc -> loc.getCoordinates().equals(new Location.Coordinates(longitude, latitude)));
 
@@ -234,7 +242,7 @@ class LocationServletTest extends AbstractTestServlet {
     }
 
     private void assertLocationNotPresentForUser(String username, double longitude, double latitude) {
-        boolean noActiveLocations = userRepository.fetchUserLocationData(username).stream()
+        boolean noActiveLocations = USER_REPOSITORY.fetchUserLocationData(username).stream()
                 .map(this::mapRowToLocation)
                 .noneMatch(loc -> loc.getCoordinates().equals(new Location.Coordinates(longitude, latitude)));
 
@@ -242,7 +250,7 @@ class LocationServletTest extends AbstractTestServlet {
     }
 
     private void assertLocationHasNewName(String username, double longitude, double latitude, String newLocationName) {
-        boolean isLocationHasNewName = userRepository.fetchUserLocationData(username).stream()
+        boolean isLocationHasNewName = USER_REPOSITORY.fetchUserLocationData(username).stream()
                 .map(this::mapRowToLocation)
                 .filter(loc -> loc.getCoordinates().equals(new Location.Coordinates(longitude, latitude)))
                 .anyMatch(loc -> loc.getName().equals(newLocationName));

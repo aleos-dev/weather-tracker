@@ -3,6 +3,8 @@ package com.aleos.servlet;
 import com.aleos.context.listener.TestContextInitializer;
 import com.aleos.service.UserService;
 import com.aleos.util.ReflectionUtil;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,12 @@ class WelcomeServletTest extends AbstractTestServlet {
     @BeforeAll
     static void beforeAll() {
         initializeDependencies();
+        TestContextInitializer.getBean(Flyway.class).migrate();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        TestContextInitializer.getBean(Flyway.class).clean();
     }
 
     @BeforeEach

@@ -6,6 +6,8 @@ import com.aleos.service.VerificationService;
 import com.aleos.servlet.AbstractTestServlet;
 import com.aleos.util.DbUtil;
 import com.aleos.util.ReflectionUtil;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +31,12 @@ class VerifyServletTest extends AbstractTestServlet {
     @BeforeAll
     static void beforeAll() {
         initializeDependencies();
+        TestContextInitializer.getBean(Flyway.class).migrate();
+    }
+
+    @AfterAll
+    static void afterAll() {
+        TestContextInitializer.getBean(Flyway.class).clean();
     }
 
     @BeforeEach
