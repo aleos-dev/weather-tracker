@@ -1,6 +1,7 @@
 package com.aleos.servlet;
 
 import com.aleos.context.listener.TestContextInitializer;
+import com.aleos.service.UserService;
 import com.aleos.util.ReflectionUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,19 +17,18 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WelcomeServletTest extends AbstractTestServlet {
 
+    private static WelcomeServlet realServlet;
     private static WelcomeServlet spyServlet;
 
     @BeforeAll
     static void beforeAll() {
-        WelcomeServlet realServlet = new WelcomeServlet();
-        ReflectionUtil.setFieldToObject(realServlet, "serviceLocator", TestContextInitializer.getServiceLocator());
-        spyServlet = Mockito.spy(realServlet);
+        initializeDependencies();
     }
 
     @BeforeEach
     void setUp() {
-        ReflectionUtil.setFieldToObject(spyServlet, "templateEngine", templateEngine);
-        doReturn(webContext).when(spyServlet).buildWebContext(request, response);
+        spyServlet = Mockito.spy(realServlet);
+        configureSpyServlet(spyServlet);
     }
 
     @Test
@@ -47,5 +47,11 @@ class WelcomeServletTest extends AbstractTestServlet {
         spyServlet.doGet(request, response);
 
         verify(spyServlet).processTemplate("welcome", request, response);
+    }
+
+    private static void initializeDependencies() {
+        realServlet = new WelcomeServlet();
+        ReflectionUtil.setFieldToObject(realServlet, "serviceLocator", TestContextInitializer.getServiceLocator());
+        ReflectionUtil.setFieldToObject(realServlet, "userService", TestContextInitializer.getBean(UserService.class));
     }
 }

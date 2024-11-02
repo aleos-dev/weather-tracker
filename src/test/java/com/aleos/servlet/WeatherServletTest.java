@@ -2,6 +2,7 @@ package com.aleos.servlet;
 
 import com.aleos.context.listener.TestContextInitializer;
 import com.aleos.model.dto.LocationWeatherResponse;
+import com.aleos.service.UserService;
 import com.aleos.util.ReflectionUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class WeatherServletTest extends AbstractTestServlet {
 
+    private static WeatherServlet realServlet;
     private static WeatherServlet spyServlet;
 
     private static final String USERNAME = "WeatherServletTestUser";
@@ -36,7 +38,8 @@ class WeatherServletTest extends AbstractTestServlet {
 
     @BeforeEach
     void setupPerTest() {
-        configureSpyServlet();
+        spyServlet = Mockito.spy(realServlet);
+        configureSpyServlet(spyServlet);
     }
 
     @Test
@@ -49,11 +52,9 @@ class WeatherServletTest extends AbstractTestServlet {
 
         verify(spyServlet).retrieveAuthenticationPrincipal(request);
         List<LocationWeatherResponse> capturedData = captureWeatherDataFromRequest();
-
-        assertNotNull(capturedData, "Expected weather data to be set in request attributes.");
-        assertEquals(1, capturedData.size(), "Expected weather data has one element.");
-
+        assertNonEmptyList(capturedData, "Expected weather response to be found based on the query.");
         assertWeatherData(capturedData.getFirst());
+        verifyTemplateRendered("weather", spyServlet);
     }
 
     @Test
@@ -65,23 +66,16 @@ class WeatherServletTest extends AbstractTestServlet {
         spyServlet.doGet(request, response);
 
         verify(spyServlet).retrieveAuthenticationPrincipal(request);
-        List<LocationWeatherResponse> capturedData = captureWeatherDataFromRequest();
-        assertNotNull(capturedData, "Expected weather data to be set in request attributes.");
-        assertTrue(capturedData.isEmpty(), "Expected weather data is absent");
+        assertEmptyList(captureWeatherDataFromRequest(), "Expected weather response to be empty.");
+        verifyTemplateRendered("weather", spyServlet);
     }
 
     private static void initializeDependencies() {
-        WeatherServlet realServlet = new WeatherServlet();
+        realServlet = new WeatherServlet();
         ReflectionUtil.setFieldToObject(realServlet, "serviceLocator", TestContextInitializer.getServiceLocator());
-        ReflectionUtil.setFieldToObject(realServlet, "userService", userService);
-
-        spyServlet = Mockito.spy(realServlet);
+        ReflectionUtil.setFieldToObject(realServlet, "userService", TestContextInitializer.getBean(UserService.class));
     }
 
-    private void configureSpyServlet() {
-        ReflectionUtil.setFieldToObject(spyServlet, "templateEngine", templateEngine);
-        doReturn(webContext).when(spyServlet).buildWebContext(request, response);
-    }
 
     private List<LocationWeatherResponse> captureWeatherDataFromRequest() {
         ArgumentCaptor<List<LocationWeatherResponse>> captor = ArgumentCaptor.forClass(List.class);
