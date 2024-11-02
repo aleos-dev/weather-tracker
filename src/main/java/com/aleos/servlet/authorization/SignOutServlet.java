@@ -23,7 +23,7 @@ public class SignOutServlet extends AbstractThymeleafServlet {
         }
     }
 
-    protected void signOutSession(HttpServletRequest req) {
+    private void signOutSession(HttpServletRequest req) {
         if (req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY) instanceof CustomHttpSession  session) {
             session.invalidate();
         }

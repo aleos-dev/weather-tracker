@@ -17,11 +17,14 @@ public final class ReflectionUtil {
     }
 
     public static void setFieldToObject(Object obj, String fieldName, Object value) {
-        Stream.concat(
-                        Arrays.stream(obj.getClass().getDeclaredFields()),
-                        Arrays.stream(obj.getClass().getSuperclass().getDeclaredFields()))
+        Stream.of(
+                        obj.getClass().getDeclaredFields(),
+                        obj.getClass().getSuperclass().getDeclaredFields(),
+                        obj.getClass().getSuperclass().getSuperclass().getDeclaredFields()
+                )
+                .flatMap(Arrays::stream)
                 .filter(field -> field.getName().equals(fieldName))
-                .findAny()
+                .findFirst()
                 .ifPresent(field -> setValue(obj, field, value));
     }
 
