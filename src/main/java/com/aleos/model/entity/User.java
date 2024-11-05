@@ -2,6 +2,7 @@ package com.aleos.model.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,13 +31,16 @@ public class User implements Serializable {
     @Size(min = USERNAME_MIN_LENGTH, max = USERNAME_MAX_LENGTH,
             message = "Username must be between {min} and {max} characters long.")
     @NaturalId
+    @NotNull
     @Column(nullable = false, unique = true)
     private String username;
 
+    @NotNull
     @Size(min = PASSWORD_MIN_LENGTH, message = "Password length should be at least {min} chars.")
     @Column(nullable = false)
     private String password;
 
+    @NotNull
     @Email(message = "Email should be valid.")
     @Column(nullable = false, unique = true)
     private String email;

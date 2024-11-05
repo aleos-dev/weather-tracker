@@ -121,6 +121,12 @@ public class AbstractThymeleafServlet extends HttpServlet {
         return req.getAttribute(ERROR_ATTRIBUTE_KEY) == null;
     }
 
+    protected WebContext buildWebContext(HttpServletRequest req, HttpServletResponse res) {
+        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(req.getServletContext());
+
+        return new WebContext(application.buildExchange(req, res));
+    }
+
     private Object createObject(Constructor<?> dtoConstructor, Object[] args) {
         try {
             return dtoConstructor.newInstance(args);
@@ -143,12 +149,6 @@ public class AbstractThymeleafServlet extends HttpServlet {
             logger.error(errorMessage);
             throw new ParseDtoException(errorMessage, e);
         }
-    }
-
-    private WebContext buildWebContext(HttpServletRequest req, HttpServletResponse res) {
-        JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(req.getServletContext());
-
-        return new WebContext(application.buildExchange(req, res));
     }
 
     private ITemplateEngine retrieveTemplateEngine(ServletConfig config) {

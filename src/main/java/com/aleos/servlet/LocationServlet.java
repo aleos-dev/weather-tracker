@@ -1,5 +1,6 @@
 package com.aleos.servlet;
 
+import com.aleos.exception.servlet.CoordinateParsingException;
 import com.aleos.service.UserService;
 import com.aleos.service.WeatherApiClient;
 import jakarta.servlet.ServletConfig;
@@ -76,7 +77,7 @@ public class LocationServlet extends AbstractThymeleafServlet {
         sendRedirect("/api/v1/weather", res);
     }
 
-    private void doPatch(HttpServletRequest req, HttpServletResponse res) {
+    protected void doPatch(HttpServletRequest req, HttpServletResponse res) {
         userService.renameLocationByCoordinates(
                 retrieveAuthenticationPrincipal(req),
                 parseCoordinate("lon", req),
@@ -91,7 +92,7 @@ public class LocationServlet extends AbstractThymeleafServlet {
         try {
             return Double.parseDouble(req.getParameter(key));
         } catch (NumberFormatException | NullPointerException e) {
-            throw new IllegalStateException("Invalid %s parameter: %s.".formatted(key, req.getParameter(key)));
+            throw new CoordinateParsingException("Invalid %s parameter: %s.".formatted(key, req.getParameter(key)), e);
         }
     }
 

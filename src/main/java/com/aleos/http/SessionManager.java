@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.aleos.http.CustomHttpSessionImpl.AUTH_SESSION_KEY;
 import static org.slf4j.LoggerFactory.*;
 
 @RequiredArgsConstructor
@@ -157,12 +158,10 @@ public class SessionManager {
         try {
             var session = objectMapper.readValue(sessionData, CustomHttpSessionImpl.class);
 
-            Optional.ofNullable(session.getAttribute("AUTHENTICATION"))
+            Optional.ofNullable(session.getAttribute(AUTH_SESSION_KEY))
                     .filter(LinkedHashMap.class::isInstance)
                     .map(auth -> objectMapper.convertValue(auth, AuthenticationToken.class))
-                    .ifPresentOrElse(
-                            session::setAuthentication,
-                            () -> session.removeAttribute(CustomHttpSessionImpl.AUTH_SESSION_KEY));
+                    .ifPresent(session::setAuthentication);
 
             return session;
         } catch (JsonProcessingException e) {

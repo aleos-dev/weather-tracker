@@ -31,9 +31,7 @@ public class AuthenticationFilter extends HttpFilter {
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        restoreAuthenticationFromSession(req);
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = restoreAuthenticationFromSession(req);
 
         if (isNotAuthenticated(auth) && isAuthRequest(req)) {
             var username = req.getParameter(USERNAME_PARAM);
@@ -56,10 +54,11 @@ public class AuthenticationFilter extends HttpFilter {
         chain.doFilter(req, res);
     }
 
-    private void restoreAuthenticationFromSession(HttpServletRequest req) {
+    private Authentication restoreAuthenticationFromSession(HttpServletRequest req) {
         var session = getCustomHttpSession(req);
         Optional<Authentication> auth = session.getAuthentication();
         auth.ifPresent(SecurityContextHolder.getContext()::setAuthentication);
+        return auth.orElse(null);
     }
 
     private CustomHttpSession getCustomHttpSession(HttpServletRequest req) {

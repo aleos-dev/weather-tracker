@@ -3,6 +3,7 @@ package com.aleos.servlet.filter;
 import com.aleos.exception.WeatherClientException;
 import com.aleos.exception.repository.UniqueConstraintViolationException;
 import com.aleos.exception.security.ResourceNotFoundException;
+import com.aleos.exception.servlet.CoordinateParsingException;
 import com.aleos.model.ErrorDetails;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -29,11 +30,14 @@ public class GlobalExceptionHandler extends HttpFilter {
             handleSpecificException(req, res, e, "Unique constraint violation.");
         } catch (WeatherClientException e) {
             handleSpecificException(req, res, e, "Weather client exception");
+        } catch (CoordinateParsingException e) {
+            logger.error("Coordinate parsing exception.", e);
+            handleSpecificException(req, res, e, "Coordinates have wrong format. Aborting request.");
         } catch (ResourceNotFoundException e) {
             logger.warn("Resource not found.", e);
             res.sendError(404);
         } catch (Exception e) {
-            logger.warn("Global exception occurred.", e);
+            logger.error("Global exception occurred.", e);
             res.sendError(500);
         }
     }

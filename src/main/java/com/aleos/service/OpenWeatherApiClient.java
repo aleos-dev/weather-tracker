@@ -26,7 +26,7 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OpenWeatherApiClient.class);
 
-    private static final String API_KEY = validateApiKey();
+    private static final String WEATHER_API_KEY = Properties.get("WEATHER_API_KEY").orElseThrow();
     private static final String METRIC_SYSTEM = Properties.get("weather.api.units").orElse("metric");
     private static final int API_RESPONSE_LIMIT = Integer.parseInt(Properties.get("weather.api.response.limit").orElse("8"));
 
@@ -75,12 +75,11 @@ public class OpenWeatherApiClient implements WeatherApiClient {
     }
 
     private URI createGeocodingUri(String locationName) {
-        return URI.create(
-                String.format(GEOCODING_URL_FORMAT, locationName, API_RESPONSE_LIMIT, API_KEY));
+        return URI.create(String.format(GEOCODING_URL_FORMAT, locationName, API_RESPONSE_LIMIT, WEATHER_API_KEY));
     }
 
     private URI createLocationUri(double longitude, double latitude) {
-        return URI.create(String.format(OPEN_WEATHER_URL_FORMAT, longitude, latitude, API_KEY, METRIC_SYSTEM));
+        return URI.create(String.format(OPEN_WEATHER_URL_FORMAT, longitude, latitude, WEATHER_API_KEY, METRIC_SYSTEM));
     }
 
     private List<Location> parseLocations(String body) {
@@ -145,13 +144,5 @@ public class OpenWeatherApiClient implements WeatherApiClient {
         return stateNode != null
                 ? String.join(", ", country, stateNode.asText())
                 : country;
-    }
-
-    private static String validateApiKey() {
-        String apiKey = System.getenv("OPEN_WEATHER_API_KEY");
-        if (apiKey == null || apiKey.isEmpty()) {
-            throw new IllegalStateException("API key for OpenWeatherMap is not set");
-        }
-        return apiKey;
     }
 }

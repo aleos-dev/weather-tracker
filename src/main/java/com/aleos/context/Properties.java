@@ -6,9 +6,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-public final class Properties {
+public class Properties {
 
     private static final java.util.Properties props = new java.util.Properties();
+
+    private static final String DB_URL_KEY = "DB_URL";
+    private static final String DB_USER_KEY = "DB_USER";
+    private static final String DB_PASSWORD_KEY = "DB_PASSWORD";
+
+    private static final String SENDER_EMAIL = "WEATHER_TRACKER_MAIL_SERVICE_SENDER";
+    private static final String EMAIL_SERVICE_CODE = "WEATHER_TRACKER_MAIL_SERVICE_CODE";
+
+    private static final String WEATHER_API_KEY = "WEATHER_API_KEY";
 
     static {
         try (InputStream input = Properties.class.getResourceAsStream("/application.properties")) {
@@ -17,6 +26,15 @@ public final class Properties {
             }
 
             props.load(input);
+
+            setPropertyFromEnvOrSystem(DB_URL_KEY);
+            setPropertyFromEnvOrSystem(DB_USER_KEY);
+            setPropertyFromEnvOrSystem(DB_PASSWORD_KEY);
+
+            setPropertyFromEnvOrSystem(SENDER_EMAIL);
+            setPropertyFromEnvOrSystem(EMAIL_SERVICE_CODE);
+
+            setPropertyFromEnvOrSystem(WEATHER_API_KEY);
 
         } catch (IOException e) {
             throw new PropertiesLoadingException("Failed to load properties file", e);
@@ -29,5 +47,15 @@ public final class Properties {
 
     public static Optional<String> get(String key) {
         return Optional.ofNullable(props.getProperty(key));
+    }
+
+    private static void setPropertyFromEnvOrSystem(String key) {
+        String property = System.getProperty(key, System.getenv(key));
+        if (property != null) {
+            props.setProperty(key, System.getProperty(key, System.getenv(key)));
+            return;
+        }
+
+        throw new PropertiesLoadingException("Property for the key: %s cannot be find".formatted(key));
     }
 }
