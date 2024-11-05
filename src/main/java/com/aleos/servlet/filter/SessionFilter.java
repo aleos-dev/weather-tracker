@@ -10,9 +10,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class SessionFilter extends HttpFilter {
 
     private static final String APP_RESOURCE_PREFIX = "/api/v1/";
@@ -21,26 +23,39 @@ public class SessionFilter extends HttpFilter {
 
     @Override
     public void init(FilterConfig config) {
+        log.info("Initializing SessionFilter with SessionManager dependency");
         var locator = (ServiceLocator) config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
         manager = locator.getBean(SessionManager.class);
     }
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        CustomHttpSession session = manager.getValidSession(req, res)
-                .orElseGet(() -> manager.createSession(res));
+        log.debug("Processing request: {} {}", req.getMethod(), req.getRequestURI());
+
+        CustomHttpSession session = manager
+                .getValidSession(req, res)
+                .orElseGet(() -> createNewSession(res));
 
         req.setAttribute(CustomHttpSession.SESSION_CONTEXT_KEY, session);
+        log.debug("Session set in request with ID: {}", session.getId());
 
         try {
             chain.doFilter(req, res);
         } finally {
 
-            // lazy variant of simple dirty checking to exclude session saving for the static resources
+            // Lazy check (easy dirty checking:)) to determine if session needs to be saved
             if (isAppResources(req)) {
+                log.debug("Saving session to Redis with ID: {}", session.getId());
                 manager.saveSessionToRedis(session);
+            } else {
+                log.debug("Skipping session save for non-application resource request.");
             }
         }
+    }
+
+    private CustomHttpSession createNewSession(HttpServletResponse res) {
+        log.info("No valid session found; creating a new session.");
+        return manager.createSession(res);
     }
 
     private boolean isAppResources(HttpServletRequest req) {

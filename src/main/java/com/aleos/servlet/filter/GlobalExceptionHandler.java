@@ -10,42 +10,47 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
 import static com.aleos.servlet.AbstractThymeleafServlet.ERROR_ATTRIBUTE_KEY;
+import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
+@Slf4j
 public class GlobalExceptionHandler extends HttpFilter {
-
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         try {
             chain.doFilter(req, res);
-
         } catch (UniqueConstraintViolationException e) {
-            handleSpecificException(req, res, e, "Unique constraint violation.");
+            handleException(req, res, e, "Unique constraint violation.", HttpServletResponse.SC_BAD_REQUEST);
         } catch (WeatherClientException e) {
-            handleSpecificException(req, res, e, "Weather client exception");
+            handleException(req, res, e, "Weather client exception.", HttpServletResponse.SC_BAD_REQUEST);
         } catch (CoordinateParsingException e) {
-            logger.error("Coordinate parsing exception.", e);
-            handleSpecificException(req, res, e, "Coordinates have wrong format. Aborting request.");
+            handleException(req, res, e, "Coordinates have wrong format. Aborting request.", HttpServletResponse.SC_BAD_REQUEST);
         } catch (ResourceNotFoundException e) {
-            logger.warn("Resource not found.", e);
-            res.sendError(404);
+            handleException(req, res, e, "Resource not found.", SC_NOT_FOUND);
         } catch (Exception e) {
-            logger.error("Global exception occurred.", e);
-            res.sendError(500);
+            handleException(req, res, e, "Global exception occurred.", SC_INTERNAL_SERVER_ERROR);
         }
     }
 
-    private void handleSpecificException(HttpServletRequest req, HttpServletResponse res, Exception e, String logMessage) throws ServletException, IOException {
-        logger.warn(logMessage, e);
+    private void handleException(HttpServletRequest req, HttpServletResponse res, Exception e, String logMessage, int statusCode) throws IOException, ServletException {
+        switch (statusCode) {
+            case SC_INTERNAL_SERVER_ERROR -> log.error(logMessage, e);
+            case SC_NOT_FOUND -> log.warn(logMessage, e);
+            default -> log.info(logMessage, e);
+        }
+
         setErrorDetails(req, logMessage);
-        req.getRequestDispatcher(req.getRequestURI()).forward(req, res);
+        if (statusCode == SC_NOT_FOUND || statusCode == SC_INTERNAL_SERVER_ERROR) {
+            res.sendError(statusCode);
+        } else {
+            req.getRequestDispatcher(req.getRequestURI()).forward(req, res);
+        }
     }
 
     private void setErrorDetails(HttpServletRequest req, String message) {
