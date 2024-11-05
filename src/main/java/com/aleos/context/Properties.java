@@ -50,12 +50,12 @@ public class Properties {
     }
 
     private static void setPropertyFromEnvOrSystem(String key) {
-        String property = System.getProperty(key, System.getenv(key));
-        if (property != null) {
-            props.setProperty(key, System.getProperty(key, System.getenv(key)));
-            return;
+        String property = System.getProperty(key) == null ? System.getenv(key) : System.getProperty(key);
+
+        if (property == null) {
+            throw new PropertiesLoadingException("Property for the key: %s cannot be find".formatted(key));
         }
 
-        throw new PropertiesLoadingException("Property for the key: %s cannot be find".formatted(key));
+        props.setProperty(key, property);
     }
 }

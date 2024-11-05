@@ -8,7 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URI;
@@ -21,10 +21,9 @@ import java.util.List;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+@Slf4j
 @RequiredArgsConstructor
 public class OpenWeatherApiClient implements WeatherApiClient {
-
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(OpenWeatherApiClient.class);
 
     private static final String WEATHER_API_KEY = Properties.get("WEATHER_API_KEY").orElseThrow();
     private static final String METRIC_SYSTEM = Properties.get("weather.api.units").orElse("metric");
@@ -39,24 +38,30 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     @Override
     public List<Location> searchLocationByName(String locationName) {
+        log.info("Searching location by name: {}", locationName);
+
         HttpRequest geocodingRequest = HttpRequest.newBuilder()
                 .uri(createGeocodingUri(locationName))
                 .GET()
                 .build();
 
         HttpResponse<String> response = getStringHttpResponse(geocodingRequest);
+        log.debug("Received geocoding response for location: {}", locationName);
 
         return parseLocations(response.body());
     }
 
     @Override
     public WeatherApiResponse getWeatherByLocation(double longitude, double latitude) {
+        log.info("Fetching weather for coordinates: lon={}, lat={}", longitude, latitude);
+
         HttpRequest locationRequest = HttpRequest.newBuilder()
                 .uri(createLocationUri(longitude, latitude))
                 .GET()
                 .build();
 
         HttpResponse<String> response = getStringHttpResponse(locationRequest);
+        log.debug("Received weather response for coordinates: lon={}, lat={}", longitude, latitude);
 
         return response.statusCode() == SC_OK
                 ? parseWeatherResponse(response.body())
@@ -65,12 +70,13 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     private WeatherApiResponse parseWeatherResponse(String responseBody) {
         try {
+            log.debug("Parsing weather data from response body");
             WeatherApiResponse weatherResponse = objectMapper.readValue(responseBody, WeatherApiResponse.class);
             weatherResponse.setDataAvailable(true);
+            log.debug("Parsing weather data from response body");
             return weatherResponse;
         } catch (JsonProcessingException e) {
-            logger.error("Failed to parse weather data", e);
-            throw new WeatherClientException("Failed to parse weather data");
+            throw new WeatherClientException("Failed to parse weather data", e);
         }
     }
 
@@ -84,6 +90,7 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
     private List<Location> parseLocations(String body) {
         try {
+            log.debug("Parsing locations from response body");
             JsonNode rootNode = objectMapper.readTree(body);
 
             List<Location> locations = new ArrayList<>();
@@ -95,38 +102,45 @@ public class OpenWeatherApiClient implements WeatherApiClient {
 
                 locations.add(buildLocation(name, lon, lat));
             }
-
+            log.info("Parsed {} locations successfully", locations.size());
             return locations;
 
         } catch (JsonProcessingException e) {
-            logger.error("Failed to parse location data", e);
-            throw new WeatherClientException("Failed to parse location data");
+            throw new WeatherClientException("Failed to parse location data", e);
         }
     }
 
     private HttpResponse<String> getStringHttpResponse(HttpRequest geocodingRequest) {
         try {
+            log.info("Sending request to {}", geocodingRequest.uri());
             var response = httpClient.send(geocodingRequest, HttpResponse.BodyHandlers.ofString());
+            log.debug("Received response with status code: {}", response.statusCode());
+
             return checkResponse(response);
 
         } catch (IOException e) {
-            logger.error("Weather service error occurred: ", e);
-            throw new WeatherClientException("Error occurred while calling the weather service");
+            throw new WeatherClientException("Error occurred while calling the weather service", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("Thread was interrupted: ", e);
-            throw new WeatherClientException("Thread was interrupted while calling the weather service");
+            log.error("Thread was interrupted");
+            throw new WeatherClientException("Thread was interrupted while calling the weather service", e);
         }
     }
 
     private HttpResponse<String> checkResponse(HttpResponse<String> response) {
-        return switch (response.statusCode()) {
+        int statusCode = response.statusCode();
+        log.debug("Checking response status code: {}", statusCode);
 
+        return switch (statusCode) {
             case SC_OK -> response;
-            case SC_NOT_FOUND -> throw new WeatherClientException("Location not found. 404");
-
-            default ->
-                    throw new WeatherClientException("Failed to fetch weather data: Status Code " + response.statusCode());
+            case SC_NOT_FOUND -> {
+                log.warn("Location not found: 404");
+                throw new WeatherClientException("Location not found. 404");
+            }
+            default -> {
+                log.error("Unexpected status code received: {}", statusCode);
+                throw new WeatherClientException("Failed to fetch weather data: Status Code " + statusCode);
+            }
         };
     }
 
