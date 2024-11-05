@@ -70,7 +70,7 @@ public class AuthenticationFilter extends HttpFilter {
     }
 
     private static boolean isNotAuthenticated(Authentication auth) {
-        return auth == null || auth.isAnonymous() || !auth.isAuthenticated();
+        return auth == null || auth.isAnonymous() || !auth.setAuthenticated();
     }
 
     private static boolean isAuthRequest(HttpServletRequest req) {

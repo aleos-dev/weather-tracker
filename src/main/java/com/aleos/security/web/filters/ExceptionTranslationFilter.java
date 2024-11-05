@@ -30,7 +30,7 @@ public class ExceptionTranslationFilter extends HttpFilter {
 
         } catch (AccessDeniedException e) {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
+            if (authentication != null && authentication.setAuthenticated()) {
                 logger.debug("User not have access to resource");
                 res.sendError(403, "Access Denied");
             } else {

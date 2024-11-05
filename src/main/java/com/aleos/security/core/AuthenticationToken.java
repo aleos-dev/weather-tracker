@@ -48,12 +48,12 @@ public class AuthenticationToken implements Authentication {
     }
 
     @Override
-    public boolean isAuthenticated() {
+    public boolean setAuthenticated() {
         return authenticated;
     }
 
     @Override
-    public void isAuthenticated(boolean isAuthenticated) {
+    public void setAuthenticated(boolean isAuthenticated) {
         this.authenticated = isAuthenticated;
     }
 
