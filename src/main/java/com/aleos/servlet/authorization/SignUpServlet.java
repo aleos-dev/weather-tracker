@@ -60,7 +60,7 @@ public class SignUpServlet extends AbstractAuthServlet {
     }
 
     private void sendConfirmation(UserVerificationToken token, HttpServletRequest req) {
-        String requestUrl = req.getRequestURL().toString().replace("register", "verify");
+        String requestUrl = req.getRequestURL().toString().replace("sign-up", "verify");
         String verificationUrl = requestUrl + "?token=" + token.getToken();
 
         emailService.sendVerificationEmail(token.getUser().getEmail(), verificationUrl);
