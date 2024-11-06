@@ -1,40 +1,57 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
-    color: #333;
+/* Center the entire content wrapper */
+.content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; /* Takes up full viewport height */
+    text-align: center; /* Center text within the container */
+}
+
+/* Error image styling */
+.error-image {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
 }
 
-.container {
-    background-color: #fff;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+.error-icon {
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto; /* Center image */
+    opacity: 0.8;
 }
 
+/* Heading styling */
 h1 {
-    color: #e74c3c;
+    font-size: 2.5rem;
+    color: #d9534f; /* Bootstrap red for error indication */
+    font-weight: bold;
     margin-bottom: 15px;
 }
 
-.error-message {
-    color: #333;
-    font-size: 1.1em;
-    margin-bottom: 20px;
+/* Message styling */
+.text-muted {
+    font-size: 1.2rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
 }
 
-.home-link a {
-    text-decoration: none;
-    color: #3498db;
+/* Button styling */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    text-transform: uppercase;
     font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
 }
 
-.home-link a:hover {
-    color: #2980b9;
+/* Ensure the button link is centered */
+.btn-primary:hover {
+    background-color: #0056b3;
+    color: #fff;
+    text-decoration: none;
 }

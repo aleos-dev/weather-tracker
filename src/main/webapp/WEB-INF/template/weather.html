@@ -1,60 +1,67 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{/fragment/head :: head ('Weather tracker')}"></head>
 
 <body>
 <div class="content-wrapper d-flex flex-column min-vh-100">
+    <!-- Header Section -->
     <div th:replace="~{/fragment/header :: full-header}"></div>
 
+    <!-- Messages Section -->
     <div th:replace="~{/fragment/messages :: displayMessage}"></div>
     <div th:replace="~{/fragment/messages :: displayErrorMessage}"></div>
 
+    <!-- Weather Container -->
     <div class="weather-container flex-grow-1" th:with="
-                    isQueryRequest=${userLocationsWeather == null},
-                    hasQueryLocations=${locationsByQuery != null},
-                    isUserLocationRequest=${userLocationsWeather != null},
-                    hasUserLocations=${!#lists.isEmpty(userLocationsWeather)}">
+            isQueryRequest=${userLocationsWeather == null},
+            hasQueryLocations=${locationsByQuery != null},
+            isUserLocationRequest=${userLocationsWeather != null},
+            hasUserLocations=${!#lists.isEmpty(userLocationsWeather)}">
 
-        <form th:action="@{/api/v1/locations}" method="get"
-              class="search-bar container d-flex align-content-center">
+        <!-- Search Form -->
+        <form th:action="@{/api/v1/locations}" method="get" class="search-bar container d-flex align-items-center">
             <input type="text" name="query" id="query" placeholder="Search locations"
-                   class="form-control ms-3 me-3 mt-3"
-                   style="flex: 1;">
-
+                   class="form-control ms-3 me-3 mt-3 flex-grow-1">
             <button type="submit" class="btn btn-primary me-3 mt-3">Search</button>
 
+            <!-- Back Link -->
             <div class="back-link me-3" th:if="${isQueryRequest}">
                 <a href="/api/v1/weather" class="btn btn-outline-secondary mt-3">&larr; Go Back to Tracked Locations</a>
             </div>
         </form>
 
-        <h2 th:if="${isQueryRequest and !hasQueryLocations}" class="mt-3 text-md-center">No results found.</h2>
-        <h2 th:if="${isUserLocationRequest and !hasUserLocations}" class="mt-3 text-md-center">No tracked locations</h2>
+        <!-- No Results and No Tracked Locations Messages -->
+        <h2 th:if="${isQueryRequest && !hasQueryLocations}" class="mt-3 text-center">No results found.</h2>
+        <h2 th:if="${isUserLocationRequest && !hasUserLocations}" class="mt-3 text-center">No tracked locations</h2>
 
+        <!-- Locations List for Search Results -->
         <div class="locations-list container" th:if="${hasQueryLocations}">
             <div class="col-sm-6 col-md-4 col-lg-3 mb-3 mt-3" th:each="location : ${locationsByQuery}">
                 <div th:insert="~{fragment/location-card :: location-search-card}"></div>
             </div>
         </div>
 
+        <!-- Locations List for User's Tracked Locations -->
         <div class="locations-list container" th:if="${hasUserLocations}">
             <div class="col-sm-6 col-md-4 col-lg-3 mb-3 mt-3" th:each="locationWeather : ${userLocationsWeather}">
                 <div class="weather-card"
                      th:attr="data-temp=${locationWeather.weatherDetails.temperatureInfo.currentTemp}">
                     <div th:insert="~{fragment/location-card :: location-weather-card}"></div>
 
+                    <!-- Trivia Popup -->
                     <div class="trivia-popup" style="display: none;">
-                        <p id="trivia-content">Loading trivia...</p>
+                        <p class="trivia-content">Loading trivia...</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer Section -->
     <div th:replace="~{/fragment/footer :: footer}"></div>
 </div>
 
+<!-- JavaScript Files -->
 <script src="/resources/js/weather.js"></script>
 <script src="/resources/js/change-location-name.js"></script>
 </body>

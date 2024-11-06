@@ -1,83 +1,87 @@
+<!-- Location Search Card Fragment -->
 <div th:fragment="location-search-card">
     <div class="card h-100">
         <div class="card-body">
-
             <h5 class="card-title" th:text="${location.name}">Location Name</h5>
 
             <div class="map">
-                <iframe class="card-img-bottom" title="google-map-frame"
+                <iframe class="card-img-bottom google-map-frame" title="google-map-frame"
                         th:src="'https://maps.google.com/maps?q=' + ${location.coordinates.lat} + ',' + ${location.coordinates.lon} + '&z=8&output=embed'"
-                        style="border:0; width:100%; height:200px;" allowfullscreen></iframe>
+                        allowfullscreen></iframe>
             </div>
 
             <form th:action="@{/api/v1/locations}" method="post">
                 <input type="hidden" name="lat" th:value="${location.coordinates.lon}">
                 <input type="hidden" name="lon" th:value="${location.coordinates.lat}">
                 <input type="hidden" name="locationName" th:value="${location.name}">
-                <button type="submit" class="btn btn-primary">Track Location</button>
+                <button type="submit" class="btn btn-primary mt-3">Track Location</button>
             </form>
         </div>
     </div>
 </div>
 
+<!-- Location Weather Card Fragment -->
 <div th:fragment="location-weather-card">
     <div class="card h-100">
-        <div class="card-body" th:object="${locationWeather}">
 
-            <form th:action="@{/api/v1/locations}" method="post" class="position-absolute"
-                  style="top: -6px; right: 2px;">
-                <input type="hidden" name="_method" value="DELETE">
-                <input type="hidden" th:name="lon" th:value="*{longitude}"/>
-                <input type="hidden" th:name="lat" th:value="*{latitude}"/>
-                <button type="submit" class="btn-close" aria-label="Delete"></button>
-            </form>
+        <!-- Delete Button (Top Right Corner) -->
+        <form th:action="@{/api/v1/locations}" method="post" class="delete-btn-form">
+            <input type="hidden" name="_method" value="DELETE">
+            <input type="hidden" th:name="lon" th:value="${locationWeather.longitude}"/>
+            <input type="hidden" th:name="lat" th:value="${locationWeather.latitude}"/>
+            <button type="submit" class="close-button" aria-label="Delete">&times;</button>
+        </form>
 
-            <h5 class="card-title location-name" th:text="*{locationName}">locationName</h5>
+        <div class="card-body position-relative" th:object="${locationWeather}">
 
-            <!-- Custom Modal Structure -->
-            <div class="modal customModal">
+            <!-- Location Name -->
+            <h5 class="card-title location-name" th:text="*{locationName}">Location Name</h5>
+
+            <!-- Custom Modal for Editing Location Name -->
+            <div class="modal custom-modal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <span class="close">&times;</span>
                         <h2>Enter new location name</h2>
                     </div>
                     <div class="modal-body">
-                        <input type="text" class="locationNameInput" value="*{locationName}">
+                        <input type="text" class="location-name-input" th:value="*{locationName}">
                     </div>
                     <div class="modal-footer">
-                        <button class="cancelBtn btn">Cancel</button>
-                        <button class="saveLocationName btn">OK</button>
+                        <button class="btn cancel-btn">Cancel</button>
+                        <button class="btn save-location-name">OK</button>
                     </div>
                 </div>
             </div>
 
-            <div class="d-flex align-items-center mb-2">
-                <img class="card-img-top img-fluid" style="max-height: 50px; object-fit: contain;"
+            <!-- Weather Icon and Temperature Display -->
+            <div class="weather-display d-flex align-items-center mb-2">
+                <img class="weather-icon"
                      th:src="'https://openweathermap.org/img/wn/' + *{weatherDetails.weatherConditions[0].iconCode} + '@4x.png'"
                      alt="Weather icon">
-                <span class="display-4 ms-2" th:text="*{weatherDetails.temperatureInfo.currentTemp + '°C'}"></span>
+                <span class="temperature-display" th:text="*{weatherDetails.temperatureInfo.currentTemp + '°C'}"></span>
             </div>
 
-            <div>
+            <!-- Weather Description -->
+            <div class="weather-description">
                 <span th:text="'Feels like ' + *{weatherDetails.temperatureInfo.feelsLikeTemp} + '°C'"></span>
                 <span th:text="*{weatherDetails.weatherConditions[0].description}"></span>
             </div>
 
-            <div class="d-flex justify-content-between mt-3">
+            <!-- Wind and Pressure Info -->
+            <div class="weather-details d-flex justify-content-between mt-3">
                 <div class="wind-info">
                     <i class="fas fa-wind"></i>
-                    <span
-                            th:text="' ' + *{weatherDetails.windDetails.windSpeed} + ' m/s ' + *{weatherDetails.windDetails.windDirection} + '°'"></span>
+                    <span th:text="' ' + *{weatherDetails.windDetails.windSpeed} + ' m/s ' + *{weatherDetails.windDetails.windDirection} + '°'"></span>
                 </div>
-
                 <div class="pressure-info">
                     <i class="fas fa-tachometer-alt"></i>
                     <span th:text="*{weatherDetails.temperatureInfo.pressure + ' hPa'}"></span>
                 </div>
             </div>
 
+            <!-- Additional Information: Humidity and Visibility -->
             <div class="additional-info mt-2">
-
                 <span th:text="'Humidity: ' + *{weatherDetails.temperatureInfo.humidityPercentage} + '%'"></span><br>
                 <span th:text="'Visibility: ' + *{weatherDetails.visibility} + ' km'"></span>
             </div>

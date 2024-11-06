@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const temperature = card.getAttribute('data-temp');
             const currentTime = Date.now();
 
-            // If 10 seconds have passed since the last request, show trivia
+            // If 30 seconds have passed since the last request, show trivia
             if (currentTime - lastRequestTime >= 30000) {
                 lastRequestTime = currentTime;
                 showTrivia(card, temperature);
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Automatically hide the trivia after 10 seconds
                 setTimeout(() => {
                     hideTrivia(card);
-                }, 30000);
+                }, 10000); // 10 seconds for visibility
             }
         });
     });
@@ -25,27 +25,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function showTrivia(cardElement, temperature) {
     const triviaPopup = cardElement.querySelector('.trivia-popup');
-    const triviaContent = cardElement.querySelector('#trivia-content');
+    const triviaContent = cardElement.querySelector('.trivia-content');
 
-    // Show the trivia popup
-    triviaPopup.style.display = 'block';
-    triviaContent.textContent = 'Loading trivia...';
+    if (triviaPopup && triviaContent) {
+        // Show the trivia popup
+        triviaPopup.style.display = 'block';
+        triviaContent.textContent = '';
 
-    // Fetch trivia based on the temperature
-    fetch(`http://numbersapi.com/${temperature}`)
-        .then(response => response.text())
-        .then(trivia => {
-            triviaContent.textContent = trivia;
-        })
-        .catch(error => {
-            console.error('Error fetching trivia:', error);
-            triviaContent.textContent = "Couldn't load trivia.";
-        });
+        // Fetch trivia based on the temperature
+        // fetch(`https://numbersapi.com/${temperature}`)
+        fetch('https://uselessfacts.jsph.pl/random.json?language=en')
+            .then(response => response.json())
+            .then(trivia => {
+                triviaContent.textContent = trivia.text;
+            })
+            .catch(error => {
+                console.error('Error fetching trivia:', error);
+                triviaContent.textContent = "";
+            });
+    }
 }
 
 function hideTrivia(cardElement) {
     const triviaPopup = cardElement.querySelector('.trivia-popup');
 
-    // Hide the trivia popup after 10 seconds
-    triviaPopup.style.display = 'none';
+    // Hide the trivia popup
+    if (triviaPopup) {
+        triviaPopup.style.display = 'none';
+    }
 }
