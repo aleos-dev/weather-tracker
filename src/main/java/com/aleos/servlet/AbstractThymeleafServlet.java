@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
@@ -31,9 +31,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 public class AbstractThymeleafServlet extends HttpServlet {
-    public static final Logger logger = org.slf4j.LoggerFactory.getLogger(AbstractThymeleafServlet.class);
 
+    private static final String ERROR_PAGE_TEMPLATE = "errorPage";
     public static final String ERROR_ATTRIBUTE_KEY = "errors";
     public static final String MESSAGE_ATTRIBUTE_KEY = "message";
 
@@ -48,46 +49,45 @@ public class AbstractThymeleafServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
+        log.info("Initializing AbstractThymeleafServlet");
 
         templateEngine = retrieveTemplateEngine(config);
         serviceLocator = retrieveServiceLocator(config);
     }
 
     protected void processTemplate(String template, HttpServletRequest req, HttpServletResponse res) {
+        log.debug("Processing template: {}", template);
         try {
             var ctx = buildWebContext(req, res);
             templateEngine.process(template, ctx, res.getWriter());
+            log.info("Template {} processed successfully", template);
         } catch (IOException e) {
-            throw new ResponseWritingException("Failed to write response", e);
+            throw new ResponseWritingException("Failed to write response for template: %s".formatted(template), e);
         }
     }
 
     protected <T> T parseSimpleDto(Class<T> dtoClass, HttpServletRequest req) {
+        log.debug("Parsing DTO for class: {}", dtoClass.getSimpleName());
         Field[] fields = dtoClass.getDeclaredFields();
         Constructor<?> dtoConstructor = getDeclaredConstructor(dtoClass, fields);
 
-        Object[] args = Arrays.stream(fields)
-                .map(field -> {
-                    field.setAccessible(true);
-                    if (field.getType() != String.class) {
-                        throw new ParseDtoException("Invalid DTO: Only String constructors are allowed for parsing.");
-                    }
-                    RequestParam annotation = field.getAnnotation(RequestParam.class);
-                    String paramName = annotation != null ? annotation.value() : field.getName();
-                    var pVal = req.getParameter(paramName);
-                    return pVal != null ? pVal.trim() : null;
-                })
-                .toArray();
+        Object[] args = getDtoConstructorArguments(req, fields);
+        T dtoInstance = createDtoInstance(dtoConstructor, args);
+        log.info("DTO parsed successfully for class: {}", dtoClass.getSimpleName());
 
-        return (T) createObject(dtoConstructor, args);
+        return dtoInstance;
     }
 
     protected <T> Optional<ErrorDetails> validatePayload(Validator payloadValidator, T inputPayload) {
+        log.debug("Validating payload of type: {}", inputPayload.getClass().getSimpleName());
         Set<ConstraintViolation<T>> constraintViolations = payloadValidator.validate(inputPayload);
+
         if (constraintViolations.isEmpty()) {
+            log.info("Payload validation passed for type: {}", inputPayload.getClass().getSimpleName());
             return Optional.empty();
         }
 
+        log.warn("Payload validation failed with {} violations", constraintViolations.size());
         return Optional.of(
                 new ErrorDetails(
                         constraintViolations.stream()
@@ -97,16 +97,19 @@ public class AbstractThymeleafServlet extends HttpServlet {
     }
 
     protected void sendRedirect(String redirectUrl, HttpServletResponse res) {
+        log.info("Sending redirect to URL: {}", redirectUrl);
         try {
             res.sendRedirect(redirectUrl);
+            log.debug("Redirect to {} successful", redirectUrl);
         } catch (IOException e) {
             throw new RedirectException("Failed to process redirect to %s".formatted(redirectUrl), e);
         }
     }
 
     protected void renderErrorPage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
+        log.warn("Rendering error page with message: {}", errorMessage);
         req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorDetails.fromSingleError(errorMessage));
-        processTemplate("errorPage", req, res);
+        processTemplate(ERROR_PAGE_TEMPLATE, req, res);
     }
 
     protected CustomHttpSession getSessionContext(HttpServletRequest req) {
@@ -131,8 +134,8 @@ public class AbstractThymeleafServlet extends HttpServlet {
         try {
             return dtoConstructor.newInstance(args);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            logger.error("Creation of the dto instance is failed");
-            throw new ParseDtoException("Creation of the dto instance is failed", e);
+            var message = "Creation of the DTO instance failed for constructor: {}, dtoConstructor.getName()";
+            throw new ParseDtoException(message, e);
         }
     }
 
@@ -144,25 +147,25 @@ public class AbstractThymeleafServlet extends HttpServlet {
                             .toArray(Class<?>[]::new)
             );
         } catch (NoSuchMethodException e) {
-            String errorMessageTemplate = "The parsing for the dto: %s was failed";
-            String errorMessage = errorMessageTemplate.formatted(dtoClass.getSimpleName());
-            logger.error(errorMessage);
-            throw new ParseDtoException(errorMessage, e);
+            String message = "The parsing for the DTO %s failed due to missing constructor.".formatted(dtoClass.getSimpleName());
+            throw new ParseDtoException(message, e);
         }
     }
 
     private ITemplateEngine retrieveTemplateEngine(ServletConfig config) {
+        log.debug("Retrieving TemplateEngine from ServletConfig");
         var obj = config.getServletContext()
                 .getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
 
         if (obj instanceof ITemplateEngine templateEngineObj) {
             return templateEngineObj;
         } else {
-            throw new BeanInitializationException("TemplateEngine bean is not of the correct type");
+            throw new BeanInitializationException("TemplateEngine bean is not of the correct type in ServletContext");
         }
     }
 
     private ServiceLocator retrieveServiceLocator(ServletConfig config) {
+        log.debug("Retrieving ServiceLocator from ServletConfig");
         var obj = config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
 
         if (obj instanceof ServiceLocator serviceLocatorObj) {
@@ -174,5 +177,25 @@ public class AbstractThymeleafServlet extends HttpServlet {
 
     private <T> String formatConstraintViolation(ConstraintViolation<T> violation) {
         return violation.getPropertyPath() + ": " + violation.getMessage();
+    }
+
+    private static Object[] getDtoConstructorArguments(HttpServletRequest req, Field[] fields) {
+        return Arrays.stream(fields)
+                .map(field -> {
+                    field.setAccessible(true);
+                    if (field.getType() != String.class) {
+                        throw new ParseDtoException("Invalid DTO: Only String constructors are allowed for parsing.");
+                    }
+                    RequestParam annotation = field.getAnnotation(RequestParam.class);
+                    String paramName = annotation != null ? annotation.value() : field.getName();
+                    var pVal = req.getParameter(paramName);
+                    log.debug("Parsed parameter {} with value: {}", paramName, pVal);
+                    return pVal != null ? pVal.trim() : null;
+                })
+                .toArray();
+    }
+
+    private <T> T createDtoInstance(Constructor<?> dtoConstructor, Object[] args) {
+        return (T) createObject(dtoConstructor, args);
     }
 }

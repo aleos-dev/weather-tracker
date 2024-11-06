@@ -1,6 +1,9 @@
 package com.aleos.security.web.filters;
 
-import com.aleos.security.core.*;
+import com.aleos.security.core.Authentication;
+import com.aleos.security.core.AuthenticationToken;
+import com.aleos.security.core.Role;
+import com.aleos.security.core.SimpleGrantedAuthority;
 import com.aleos.security.util.SingletonSupplier;
 import com.aleos.security.web.context.SecurityContext;
 import com.aleos.security.web.context.SecurityContextHolder;
@@ -45,7 +48,7 @@ public class AnonymousAuthenticationFilter extends HttpFilter {
 
     private Authentication createAuthentication() {
         var authToken = new AuthenticationToken(ANONYMOUS_USER, new SimpleGrantedAuthority(Role.ANONYMOUS));
-        authToken.isAuthenticated(false);
+        authToken.setAuthenticated(false);
         return authToken;
     }
 }

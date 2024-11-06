@@ -1,17 +1,13 @@
 package com.aleos.http;
 
 import com.aleos.security.core.Authentication;
-import com.aleos.security.core.AuthenticationToken;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,7 +71,7 @@ public class CustomHttpSessionImpl implements CustomHttpSession {
     @Override
     public boolean isAuthenticated() {
         return getAuthentication()
-                .map(Authentication::isAuthenticated)
+                .map(Authentication::setAuthenticated)
                 .orElse(false);
     }
 

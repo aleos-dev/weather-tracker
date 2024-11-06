@@ -9,9 +9,9 @@ public interface Authentication extends Serializable {
 
     List<GrantedAuthority> getAuthorities();
 
-    boolean isAuthenticated();
+    boolean setAuthenticated();
 
-    void isAuthenticated(boolean isAuthenticated);
+    void setAuthenticated(boolean isAuthenticated);
 
     boolean isAnonymous();
 }

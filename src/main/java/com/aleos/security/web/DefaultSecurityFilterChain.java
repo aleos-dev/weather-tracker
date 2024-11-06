@@ -3,10 +3,12 @@ package com.aleos.security.web;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 public class DefaultSecurityFilterChain implements SecurityFilterChain {
 
     private final String pattern;
@@ -16,19 +18,21 @@ public class DefaultSecurityFilterChain implements SecurityFilterChain {
     public DefaultSecurityFilterChain(String pattern, List<Filter> filters) {
         this.pattern = pattern;
         this.filters = filters;
+        log.info("DefaultSecurityFilterChain created with pattern: {} and filters: {}", pattern, filters);
     }
 
     @Override
     public boolean matches(HttpServletRequest request) {
-        return request.getRequestURI().startsWith(pattern);
+        boolean match = request.getRequestURI().startsWith(pattern);
+        log.debug("Request URI: {} - Pattern: {} - Matches: {}", request.getRequestURI(), pattern, match);
+        return match;
     }
 
     @Override
     public void apply(HttpServletRequest request, HttpServletResponse response, FilterChain originalChain)
             throws ServletException, IOException {
-
-            FilterChainImpl customChain = new FilterChainImpl(filters, originalChain);
-            customChain.doFilter(request, response);
+        FilterChainImpl customChain = new FilterChainImpl(filters, originalChain);
+        customChain.doFilter(request, response);
     }
 
     @Override
@@ -54,8 +58,10 @@ public class DefaultSecurityFilterChain implements SecurityFilterChain {
         public void doFilter(ServletRequest req, ServletResponse res) throws IOException, ServletException {
             if (currentPosition < filters.size()) {
                 Filter nextFilter = filters.get(currentPosition++);
+                log.debug("Applying filter: {} - Position: {}", nextFilter, currentPosition);
                 nextFilter.doFilter(req, res, this);
             } else {
+                log.debug("All custom filters applied, proceeding with the original filter chain.");
                 originalChain.doFilter(req, res);
             }
         }

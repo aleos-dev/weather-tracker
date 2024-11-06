@@ -7,23 +7,21 @@ import com.aleos.security.core.Authentication;
 import com.aleos.security.core.GrantedAuthority;
 import com.aleos.security.core.Role;
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@Slf4j
 public class AuthorizationManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthorizationManager.class);
 
     private final Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
 
     public boolean check(HttpServletRequest req, Supplier<Authentication> authentication) {
         var requestURI = req.getRequestURI();
-        logger.info("Checking authorization for request: {}", requestURI);
+        log.info("Checking authorization for request: {}", requestURI);
 
         var auth = getAuthenticatedUser(authentication);
         List<Role> allowedRoles = getAllowedRolesForRequest(requestURI);
@@ -33,40 +31,40 @@ public class AuthorizationManager {
                 .anyMatch(allowedRoles::contains);
 
         if (isRegistrationRequired(isAllowed, auth)) {
-            logger.warn("Authentication required for user: {}", auth.getPrincipal());
+            log.warn("Authentication required for user: {}", auth.getPrincipal());
             setOriginalRequestInSession(req);
             throw new AuthenticationException("Authentication required");
         }
-        logger.info("Authorization result for request {}: {}", requestURI, isAllowed);
+        log.info("Authorization result for request {}: {}", requestURI, isAllowed);
 
         return isAllowed;
     }
 
     public void addRules(Map<String, List<Role>> rules) {
-        logger.debug("Adding authorization rules: {}", rules);
+        log.debug("Adding authorization rules: {}", rules);
         authorizationRules.putAll(rules);
     }
 
     private Authentication getAuthenticatedUser(Supplier<Authentication> authentication) {
         var auth = authentication.get();
 
-        if ((auth != null && (auth.isAuthenticated() || auth.isAnonymous()))) {
-            logger.info("Authentication is retrieved for {}", auth.getPrincipal());
+        if ((auth != null && (auth.setAuthenticated() || auth.isAnonymous()))) {
+            log.warn("Authentication is retrieved for {}", auth.getPrincipal());
             return auth;
         }
 
-        logger.error("Authorization failed. User is not authenticated.");
+        log.error("Authorization failed. User is not authenticated.");
         throw new AuthenticationException("Not authenticated");
     }
 
     private List<Role> getAllowedRolesForRequest(String requestUri) {
-        logger.debug("Retrieving authorization roles for the requested URI: {}", requestUri);
+        log.debug("Retrieving authorization roles for the requested URI: {}", requestUri);
         return authorizationRules.entrySet().stream()
                 .filter(entry -> requestUri.startsWith(entry.getKey()))
                 .map(Map.Entry::getValue)
                 .findFirst()
                 .orElseThrow(() -> {
-                    logger.warn("Resource: {} not found", requestUri);
+                    log.warn("Resource: {} not found", requestUri);
                     return new ResourceNotFoundException("Resource not found: " + requestUri);
                 });
     }
@@ -74,7 +72,7 @@ public class AuthorizationManager {
     private void setOriginalRequestInSession(HttpServletRequest req) {
         var session = (CustomHttpSession) req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY);
         if (session.getOriginalRequest() == null) {
-            logger.debug("Set original request in session: {}", req.getRequestURI());
+            log.debug("Set original request in session: {}", req.getRequestURI());
             session.setOriginalRequest(req.getRequestURI());
         }
     }
@@ -82,7 +80,7 @@ public class AuthorizationManager {
     private boolean isRegistrationRequired(boolean isAllowed, Authentication auth) {
         boolean registrationRequired = !isAllowed && auth.isAnonymous();
 
-        logger.debug("Registration required: {}", registrationRequired);
+        log.debug("Registration required: {}", registrationRequired);
         return registrationRequired;
     }
 }
