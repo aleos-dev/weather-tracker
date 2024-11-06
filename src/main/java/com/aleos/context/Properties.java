@@ -10,14 +10,14 @@ public class Properties {
 
     private static final java.util.Properties props = new java.util.Properties();
 
-    private static final String DB_URL_KEY = "DB_URL";
-    private static final String DB_USER_KEY = "DB_USER";
-    private static final String DB_PASSWORD_KEY = "DB_PASSWORD";
+    private static final String DB_URL_KEY = "WEATHER_TRACKER_DB_URL";
+    private static final String DB_USER_KEY = "WEATHER_TRACKER_DB_USER";
+    private static final String DB_PASSWORD_KEY = "WEATHER_TRACKER_DB_PASSWORD";
 
     private static final String SENDER_EMAIL = "WEATHER_TRACKER_MAIL_SERVICE_SENDER";
     private static final String EMAIL_SERVICE_CODE = "WEATHER_TRACKER_MAIL_SERVICE_CODE";
 
-    private static final String WEATHER_API_KEY = "WEATHER_API_KEY";
+    private static final String WEATHER_API_KEY = "WEATHER_TRACKER_REMOTE_API_KEY";
 
     static {
         try (InputStream input = Properties.class.getResourceAsStream("/application.properties")) {

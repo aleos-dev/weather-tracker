@@ -31,9 +31,9 @@ import java.util.Map;
 
 public class ApplicationContextConfiguration {
 
-    private static final String DB_URL_ENV = "DB_URL";
-    private static final String DB_USER_ENV = "DB_USER";
-    private static final String DB_PASSWORD_ENV = "DB_PASSWORD";
+    private static final String DB_URL_ENV = "WEATHER_TRACKER_DB_URL";
+    private static final String DB_USER_ENV = "WEATHER_TRACKER_DB_USER";
+    private static final String DB_PASSWORD_ENV = "WEATHER_TRACKER_DB_PASSWORD";
 
     @Bean
     public ValidatorFactory validatorFactory() {

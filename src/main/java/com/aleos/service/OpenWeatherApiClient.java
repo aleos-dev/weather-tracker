@@ -25,7 +25,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 @RequiredArgsConstructor
 public class OpenWeatherApiClient implements WeatherApiClient {
 
-    private static final String WEATHER_API_KEY = Properties.get("WEATHER_API_KEY").orElseThrow();
+    private static final String WEATHER_API_KEY = Properties.get("WEATHER_TRACKER_REMOTE_API_KEY").orElseThrow();
     private static final String METRIC_SYSTEM = Properties.get("weather.api.units").orElse("metric");
     private static final int API_RESPONSE_LIMIT = Integer.parseInt(Properties.get("weather.api.response.limit").orElse("8"));
 

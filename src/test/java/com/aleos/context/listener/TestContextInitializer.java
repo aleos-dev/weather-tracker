@@ -33,9 +33,9 @@ public class TestContextInitializer implements TestExecutionListener {
             postgresContainer.start();
             logger.info("Postgres container started with database: {}, username: {}", postgresContainer.getDatabaseName(), postgresContainer.getUsername());
 
-            System.setProperty("DB_URL", postgresContainer.getJdbcUrl());
-            System.setProperty("DB_USER", postgresContainer.getUsername());
-            System.setProperty("DB_PASSWORD", postgresContainer.getPassword());
+            System.setProperty("WEATHER_TRACKER_DB_URL", postgresContainer.getJdbcUrl());
+            System.setProperty("WEATHER_TRACKER_DB_USER", postgresContainer.getUsername());
+            System.setProperty("WEATHER_TRACKER_DB_PASSWORD", postgresContainer.getPassword());
 
             serviceLocator = new BeanFactory(ApplicationContextConfiguration.class);
             logger.info("Test ApplicationContext initialized successfully.");
