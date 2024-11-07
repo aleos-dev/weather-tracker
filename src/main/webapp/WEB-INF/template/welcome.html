@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head th:replace="~{/fragment/head :: head('Welcome to Weather Tracker')}"></head>
+<link rel="stylesheet" th:href="@{/css/weather.css}">
 
 <body>
 <div class="content-wrapper d-flex flex-column min-vh-100">
@@ -29,7 +30,7 @@
 
             <div class="col-md-4 text-center">
                 <img src="/resources/icons/trivia.png" alt="Trivia icon" class="img-fluid" style="max-height: 100px;">
-                <h3>Fun Weather Trivia</h3>
+                <h3>Fun Trivia</h3>
                 <p>Did you know? The highest temperature ever recorded on Earth was 56.7°C in Death Valley, USA!</p>
             </div>
         </div>

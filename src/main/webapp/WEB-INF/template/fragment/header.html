@@ -1,5 +1,5 @@
 <div th:fragment="full-header">
-    <header class="d-flex align-items-center bg-light py-3">
+    <header class="d-flex align-items-center py-3">
         <!-- Logo -->
         <img class="ms-3" src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 50px;"/>
 
@@ -29,9 +29,9 @@
 
 <!-- Simplified Header Fragment -->
 <div th:fragment="simple-header">
-    <div class="container">
-        <img src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 30px;">
+    <header class="d-flex align-items-center justify-content-center">
+        <img class="me-3" src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 30px;">
 
         <a th:href="@{/api/v1/welcome}" class="link-no-ref-style">Weather Tracker</a>
-    </div>
+    </header>
 </div>

@@ -1,0 +1,7 @@
+body {
+    background-image: url('/resources/icons/background2.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
