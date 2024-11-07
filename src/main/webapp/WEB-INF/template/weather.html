@@ -31,7 +31,10 @@
         </form>
 
         <!-- No Results and No Tracked Locations Messages -->
-        <h2 th:if="${isQueryRequest && !hasQueryLocations}" class="mt-3 text-center">No results found.</h2>
+        <h2 th:if="${isQueryRequest && (!locationsByQuery || #lists.isEmpty(locationsByQuery))}"
+            class="mt-3 text-center">
+            No results found.
+        </h2>
         <h2 th:if="${isUserLocationRequest && !hasUserLocations}" class="mt-3 text-center">No tracked locations</h2>
 
         <!-- Locations List for Search Results -->
