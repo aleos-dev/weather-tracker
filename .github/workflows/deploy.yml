@@ -40,6 +40,9 @@ jobs:
             echo "Setting correct permissions for the new WAR file..."
             sudo chown tomcat:tomcat /opt/tomcat/webapps/weather-tracker.war
             
-            # Step 5: Start Tomcat as the tomcat user
+            # Step 5: Deploy as ROOT
+            sudo mv /opt/tomcat/webapps/weather-tracker.war /opt/tomcat/webapps/ROOT.war
+            
+            # Step 6: Start Tomcat as the tomcat user
             echo "Starting Tomcat..."
             sudo -u tomcat /opt/tomcat/bin/startup.sh
