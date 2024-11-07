@@ -1,0 +1,74 @@
+name: Release action
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4.2.1
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run Tests
+        run: |
+          mvn -B clean test \
+            -DWEATHER_TRACKER_DB_URL=TEST \
+            -DWEATHER_TRACKER_DB_USER=TEST \
+            -DWEATHER_TRACKER_DB_PASSWORD=TEST \
+            -DWEATHER_TRACKER_MAIL_SERVICE_SENDER=TEST \
+            -DWEATHER_TRACKER_MAIL_SERVICE_CODE=TEST \
+            -DWEATHER_TRACKER_REMOTE_API_KEY=${{ secrets.WEATHER_TRACKER_REMOTE_API_KEY }}
+
+      - name: Build projects
+        run: |
+          mvn -B package -DskipTests --file pom.xml
+
+      - name: Copy artifact
+        run: |
+          mkdir app
+          cp target/*.war app/weather-tracker.war
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4.3.3
+        with:
+          # identifier to uploaded files
+          name: uploaded-data
+          path: app/weather-tracker.war
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4.1.8
+        with:
+          # identifier of files to download
+          name: uploaded-data
+          path: to-release
+
+      - name: List contents of the artifact directory
+        run: ls -l to-release/
+
+      - name: Release
+        uses: ncipollo/release-action@v1.14.0
+        with:
+          name: "weather-tracker.war"
+          # path to file with the name of the uploaded file
+          artifacts: "to-release/weather-tracker.war"
+          token: ${{ secrets.FOR_RELEASE_TOKEN }}

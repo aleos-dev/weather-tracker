@@ -1,0 +1,45 @@
+name: Deploy container on a remote server
+on:
+  workflow_run:
+    workflows: [ Release action ]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote commands by ssh
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_AWS }}
+
+          script: |
+            # Step 1: Stop Tomcat as the tomcat user
+            echo "Stopping Tomcat..."
+            sudo -u tomcat /opt/tomcat/bin/shutdown.sh || true
+            
+            # Step 2: Backup the current WAR file if it exists (sudo required for mv)
+            echo "Backing up the current WAR file..."
+            if [ -f /opt/tomcat/webapps/weather-tracker.war ]; then
+              sudo mv /opt/tomcat/webapps/weather-tracker.war /opt/tomcat/webapps/weather-tracker.war.bak
+            else
+              echo "No existing WAR file found to backup."
+            fi
+
+            # Step 3: Download the latest release WAR file using the GitHub API to get the latest release dynamically
+            echo "Downloading the latest WAR file..."
+            LATEST_RELEASE=$(curl -s https://api.github.com/repos/aleos-dev/weather-tracker/releases/latest | grep "browser_download_url.*war" | cut -d : -f 2,3 | tr -d \" | tr -d ' ')
+            echo $LATEST_RELEASE
+            sudo wget $LATEST_RELEASE -O /opt/tomcat/webapps/weather-tracker.war
+            
+            # Step 4: Ensure correct permissions for the WAR file
+            echo "Setting correct permissions for the new WAR file..."
+            sudo chown tomcat:tomcat /opt/tomcat/webapps/weather-tracker.war
+            
+            # Step 5: Start Tomcat as the tomcat user
+            echo "Starting Tomcat..."
+            sudo -u tomcat /opt/tomcat/bin/startup.sh
