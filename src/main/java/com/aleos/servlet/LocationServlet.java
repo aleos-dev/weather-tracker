@@ -12,6 +12,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Slf4j
@@ -120,6 +122,6 @@ public class LocationServlet extends AbstractThymeleafServlet {
 
         return (query == null || query.isBlank())
                 ? Optional.empty()
-                : Optional.of(query.trim());
+                : Optional.of(URLEncoder.encode(query.trim(), StandardCharsets.UTF_8));
     }
 }
