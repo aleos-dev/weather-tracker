@@ -6,11 +6,11 @@
         <div class="dropdown ms-3">
             <a class="btn btn-link dropdown-toggle" href="#" id="personalLinksDropdown" role="button"
                data-bs-toggle="dropdown" aria-expanded="false">
-                🔗 Personal Links
+                🔗 Dev profile
             </a>
             <ul class="dropdown-menu" aria-labelledby="personalLinksDropdown">
-                <li><a class="dropdown-item" href="https://ale-os.com" target="_blank" rel="noopener noreferrer">My
-                    Blog</a></li>
+                <li><a class="dropdown-item" href="https://ale-os.com" target="_blank"
+                       rel="noopener noreferrer">Blog</a></li>
                 <li><a class="dropdown-item" href="https://github.com/aleos-dev" target="_blank"
                        rel="noopener noreferrer">GitHub</a></li>
                 <li><a class="dropdown-item" href="https://leetcode.com/u/aleos-dev/" target="_blank"
@@ -27,11 +27,11 @@
     </header>
 </div>
 
-
 <!-- Simplified Header Fragment -->
 <div th:fragment="simple-header">
     <div class="container">
         <img src="/resources/icons/logo.webp" alt="Weather Tracker Logo" style="height: 30px;">
-        <span>Weather Tracker</span>
+
+        <a th:href="@{/api/v1/welcome}" class="link-no-ref-style">Weather Tracker</a>
     </div>
 </div>

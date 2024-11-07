@@ -10,6 +10,17 @@
     margin-bottom: 1.5rem;
 }
 
+.location-name {
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.location-name:hover {
+    background-color: #f0f0f0;
+    color: #007bff;
+    text-decoration: underline;
+}
+
 .username {
     color: #0b5ed7;
 }
@@ -20,7 +31,7 @@
 }
 
 .temperature-display {
-    font-size: 2rem; /* Adjust size as needed */
+    font-size: 2rem;
     font-weight: bold;
     text-align: right;
 }
@@ -28,8 +39,8 @@
 .weather-display {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Keeps icon and temperature aligned */
-    gap: 10px; /* Adjust for spacing between icon and temperature */
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .weather-icon {
@@ -38,15 +49,6 @@
     object-fit: contain;
 }
 
-/*.close-button {*/
-/*    position: absolute;*/
-/*    top: 8px;*/
-/*    right: 8px;*/
-/*    background: transparent;*/
-/*    border: none;*/
-/*    font-size: 1.25rem;*/
-/*    cursor: pointer;*/
-/*}*/
 .close-button {
     position: absolute;
     top: 8px;
@@ -54,7 +56,17 @@
     background: transparent;
     border: none;
     font-size: 1.25rem;
-    color: #000; /* Customize color as needed */
+    color: #000;
     cursor: pointer;
-    z-index: 10; /* Ensures the button appears above other elements */
+    z-index: 10;
+}
+
+.link-no-ref-style {
+    color: inherit;
+    text-decoration: none;
+}
+
+.link-no-ref-style:hover {
+    color: inherit;
+    text-decoration: none;
 }
