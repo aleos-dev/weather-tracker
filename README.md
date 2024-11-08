@@ -29,8 +29,6 @@
 
 🛠 [Deployment](#deployment)
 
-🌱 [How to run the app on the local machine with Docker](#how-to-run-app-on-the-local-machine)
-
 📋 [Project Requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/weather-viewer/)
 
 💬 [Share your feedback](#share-your-feedback)
@@ -50,70 +48,68 @@
 
 --- 
 
-These revised goals clarify your intentions while retaining the technical focus of each objective.
-
 ## Technologies and Frameworks
 
 <table align="center">
   <tr>
-      <td valign="middle">
+      <td align="middle">
           <img src="https://user-images.githubusercontent.com/25181517/117201156-9a724800-adec-11eb-9a9d-3cd0f67da4bc.png" width="50"><br>
             Java
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://user-images.githubusercontent.com/25181517/117207330-263ba280-adf4-11eb-9b97-0ac5b40bc3be.png" width="50"><br>
           Docker
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://avatars.githubusercontent.com/u/13393021?s=200&v=4" 
 width="50"><br>
           Testcontainer
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://user-images.githubusercontent.com/25181517/183868728-b2e11072-00a5-47e2-8a4e-4ebbb2b8c554.png" width="50"><br>
           CI/CD
     </td>
-    <td valign="middle">
+    <td align="middle">
           <img src="https://github.com/onemarc/tech-icons/blob/main/icons/postgressql-light.svg" width="50"><br>
             Postgresql
      </td>
-    <td valign="middle">
+    <td align="middle">
           <img src=" https://www.flaticon.com/free-icon/integration_7001490" width="50"><br>
             IT
      </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://github.com/onemarc/tech-icons/blob/main/icons/redis-light.svg" width="50"><br>
           Redis
     </td>
-    <td valign="middle">
+    <td align="middle">
        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/bootstrap-light.svg" width="50"><br>
           Bootstrap
     </td>
-    <td valign="middle">
+    <td align="middle">
           <img src="https://github.com/onemarc/tech-icons/blob/main/icons/apachemaven.svg" width="50"><br>
             Maven
     </td>
-    <td valign="middle">
+    <td align="middle">
           <img src="https://github.com/onemarc/tech-icons/blob/main/icons%232/flyway.svg" width="50"><br>
             Flyway
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://github.com/onemarc/tech-icons/blob/main/icons/hibernate-dark.svg" width="50"><br>
           Hibernate
     </td>
-    <td valign="middle">
+    <td align="middle">
        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/apachetomcat.svg" width="50"><br>
           Tomcat
     </td>
-        <td valign="middle">
+        <td align="middle">
        <img src="https://user-images.githubusercontent.com/25181517/117533873-484d4480-afef-11eb-9fad-67c8605e3592.png" width="50"><br>
           JUnit
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://github.com/onemarc/tech-icons/blob/main/icons/html.svg" width="50"><br>
           HTML
     </td>
-    <td valign="middle">
+    <td align="middle">
         <img src="https://github.com/onemarc/tech-icons/blob/main/icons/css.svg" width="50"><br>
           CSS
     </td>
@@ -441,8 +437,7 @@ environments.
 #### Thymeleaf Integration
 
 Servlets utilize Thymeleaf templates for dynamic content rendering, managed through `AbstractThymeleafServlet`. The
-template engine is configured centrally, allowing shared settings across templates. This setup ensures that templates
-are processed in response to requests, with context data injected from servlet reque
+template engine is configured centrally, allowing shared settings across templates.
 
 **Thymeleaf** is a modern server-side Java templating engine designed to blend HTML templates with dynamic data in a
 readable and maintainable way. Unlike JSP, which embeds Java code directly within HTML, Thymeleaf allows you to define
@@ -478,7 +473,7 @@ correctly.
 
 Elements are defined by tags. These elements can be nested, allowing for complex web page structures. Attributes within
 the tags provide additional settings or properties for the elements, such as setting a hyperlink’s destination with the
-href attribute in an  <a/> tag.
+href attribute in an <a/> tag.
 
 HTML documents are essentially a hierarchy of elements, forming what is known as the DOM (Document Object Model), which
 scripts like JavaScript can manipulate to dynamically change the displayed content. This makes HTML not just a static
