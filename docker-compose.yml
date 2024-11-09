@@ -1,0 +1,45 @@
+services:
+  # Application
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .docker-container.env
+    environment:
+      - WEATHER_TRACKER_DB_URL=jdbc:postgresql://db:5432/${WEATHER_TRACKER_DB_NAME}
+      - WEATHER_TRACKER_DB_USER=${WEATHER_TRACKER_DB_USER}
+      - WEATHER_TRACKER_DB_PASSWORD=${WEATHER_TRACKER_DB_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: always
+
+  # PostgreSQL Database
+  db:
+    image: postgres:17
+    container_name: weather_tracker_database
+    env_file:
+      - .docker-container.env
+    environment:
+      POSTGRES_DB: ${WEATHER_TRACKER_DB_NAME}
+      POSTGRES_USER: ${WEATHER_TRACKER_DB_USER}
+      POSTGRES_PASSWORD: ${WEATHER_TRACKER_DB_PASSWORD}
+    ports:
+      - "5486:5432"
+    volumes:
+      - ${DB_DATA_HOME}/weather_tracker_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$WEATHER_TRACKER_DB_USER -d $$WEATHER_TRACKER_DB_NAME" ]
+      interval: 5s
+      retries: 5
+      timeout: 5s
+    restart: always
+
+  # Redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_HOST_PORT}:${REDIS_PORT}"

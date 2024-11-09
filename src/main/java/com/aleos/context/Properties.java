@@ -19,6 +19,9 @@ public class Properties {
 
     private static final String WEATHER_API_KEY = "WEATHER_TRACKER_REMOTE_API_KEY";
 
+    private static final String REDIS_HOST = "REDIS_HOST";
+    private static final String REDIS_PORT = "REDIS_PORT";
+
     static {
         try (InputStream input = Properties.class.getResourceAsStream("/application.properties")) {
             if (input == null) {
@@ -35,6 +38,9 @@ public class Properties {
             setPropertyFromEnvOrSystem(EMAIL_SERVICE_CODE);
 
             setPropertyFromEnvOrSystem(WEATHER_API_KEY);
+
+            setPropertyFromEnvOrSystem(REDIS_HOST);
+            setPropertyFromEnvOrSystem(REDIS_PORT);
 
         } catch (IOException e) {
             throw new PropertiesLoadingException("Failed to load properties file", e);
