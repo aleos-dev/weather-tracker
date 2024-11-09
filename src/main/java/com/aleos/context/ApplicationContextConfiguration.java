@@ -70,7 +70,10 @@ public class ApplicationContextConfiguration {
         poolConfig.setMaxIdle(5);
         poolConfig.setMinIdle(1);
 
-        return new JedisPool(poolConfig, "localhost", 6379);
+        return new JedisPool(
+                poolConfig,
+                Properties.get("REDIS_HOST").orElseThrow(),
+                Integer.parseInt(Properties.get("REDIS_PORT").orElseThrow()));
     }
 
     @Bean
