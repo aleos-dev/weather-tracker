@@ -1,7 +1,7 @@
 # Weather Tracker
 
-| 🌦️ **Welcome to the Weather Tracker project!** Through this project, I’ve learned essential concepts such as secure session management, request filtering, and server-side rendering using Thymeleaf and Bootstrap. <br/><br>Weather Tracker lets users view, save, and organize weather information for various locations. It features session and cookie management with Redis, custom security filtering to handle authentication and authorization, and an intuitive user interface powered by Thymeleaf. <br/><br>Building this app has greatly enhanced my understanding of web security and architecture, and I look forward to leveraging this knowledge in future projects. | ![](/.github/img/weather-git-main.webp) |
-|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|
+| 🌦️ **Welcome to the Weather Tracker project!** Through this project, I’ve learned essential concepts such as secure session management, request filtering, and server-side rendering using Thymeleaf and Bootstrap. <br/><br>Weather Tracker lets users view, save, and organize weather information for various locations. It features session and cookie management with Redis, custom security filtering to handle authentication and authorization, and an intuitive user interface. <br/><br>Building this app has greatly enhanced my understanding of web security and architecture, and I look forward to leveraging this knowledge in future projects. | <div>![](/.github/img/welcome-page.png) ![](/.github/img/weather-page.png) </div> |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
 
 ### 🚀 Live Demo
 
@@ -572,6 +572,83 @@ significant investment of time. My beginner attempting to use CSS cold only gras
   logging and validation, effectively securing and managing requests in a proxy structure.
 
 ---
+
+## Local Project Startup
+
+To run this project locally with Docker Compose and PostgreSQL, use the provided `docker-compose.yml` file.
+
+### Prerequisites
+
+1. **Environment Variables**: Set up the required environment variables in `.env` and `.docker-container.env` files (or
+   as system variables) to manage configurations such as the database, mail service, Redis, and the Weather API key.
+2. **Docker and Docker Compose**: Ensure Docker and Docker Compose are installed on your system.
+
+### Environment Variables Configuration
+
+Create and fill in the following files:
+
+#### `.env`
+
+```plaintext
+# Database Configuration
+DB_DATA_HOME=$HOME/.local/share/db_data
+
+WEATHER_TRACKER_DB_NAME=weather_tracker_db
+WEATHER_TRACKER_DB_USER=weather_db_user
+WEATHER_TRACKER_DB_PASSWORD=weather_db_password
+
+# Redis Configuration (Local Settings)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_HOST_PORT=6386
+```
+
+#### `.docker-container.env`
+
+```plaintext
+# Mail Service Configuration
+WEATHER_TRACKER_MAIL_SERVICE_CODE=<YOUR_MAIL_SERVICE_CODE>
+WEATHER_TRACKER_MAIL_SERVICE_SENDER=<YOUR_MAIL_SERVICE_EMAIL>
+
+# Weather API Key
+WEATHER_TRACKER_REMOTE_API_KEY=<YOUR_API_KEY>
+
+# Redis Configuration (Docker Network Settings)
+REDIS_HOST=redis
+REDIS_PORT=6379
+```
+
+### Steps to Run the Project Locally
+
+1. **Obtain an OpenWeather API Key**:
+    - Register for a free API key from OpenWeather (with a 60 requests/minute limit) and set it in
+      `.docker-container.env` as `WEATHER_TRACKER_REMOTE_API_KEY`.
+
+2. **Fill in Mail Service Credentials**:
+    - Update `.docker-container.env` with your mail service credentials, replacing `<YOUR_MAIL_SERVICE_CODE>` and
+      `<YOUR_MAIL_SERVICE_EMAIL>`.
+
+3. **Start Docker Containers**:
+    - Open a terminal in the project root directory and run the following command to start the containers in detached
+      mode:
+
+      ```bash
+      docker-compose up -d
+      ```
+
+    - This command starts the PostgreSQL and Redis containers with the specified environment variables.
+
+4. **Access the Application**
+
+    - After starting the Docker containers and running the Tomcat server, open your browser and navigate to:
+
+        ```
+        http://localhost:8080/api/v1/welcome
+        ```
+
+    - This URL should point to the welcome endpoint of your application, allowing you to verify that everything is set
+      up
+      correctly.
 
 ## Deployment
 
