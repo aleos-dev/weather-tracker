@@ -3,12 +3,15 @@
 # --------------------------------------------------------------
 
 # JDBC URL for connecting to the PostgreSQL database.
+
 WEATHER_TRACKER_DB_URL=jdbc:postgresql://localhost:5432/weather_tracker_db
 
 # Username for authenticating to the PostgreSQL database.
+
 WEATHER_TRACKER_DB_USER=weather_db_user
 
 # Password for the corresponding database user.
+
 WEATHER_TRACKER_DB_PASSWORD=weather_db_password
 
 
@@ -19,10 +22,12 @@ WEATHER_TRACKER_DB_PASSWORD=weather_db_password
 # Authentication code or API key for the email service.
 # This code is required to access a third-party email provider's API
 # for sending emails such as registration confirmations or notifications.
+
 WEATHER_TRACKER_MAIL_SERVICE_CODE="xpmm otnn yvib jxvi"
 
 # The email address used as the "From" or sender address for outgoing emails.
 # This email will appear as the sender in all communication sent by the application.
+
 WEATHER_TRACKER_MAIL_SERVICE_SENDER=sender@gmail.com
 
 
@@ -33,4 +38,12 @@ WEATHER_TRACKER_MAIL_SERVICE_SENDER=sender@gmail.com
 # API key for accessing the Weather API.
 # This key allows the application to fetch weather data from OpenWeather,
 # including forecasts, current weather, and other meteorological information.
-WEATHER_TRACKER_REMOTE_API_KEY=53deaeb8dd7525e3eee8733658c8cxbe
+
+WEATHER_TRACKER_REMOTE_API_KEY=53deaeb8dd7525e3eee8743658c8cxbe
+
+# --------------------------------------------------------------
+# Redis Configuration
+# --------------------------------------------------------------
+REDIS_HOST=localhost
+REDIS_HOST_PORT=6384
+REDIS_PORT=6379
