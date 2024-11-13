@@ -49,6 +49,7 @@ public class GlobalExceptionHandler extends HttpFilter {
         if (statusCode == SC_NOT_FOUND || statusCode == SC_INTERNAL_SERVER_ERROR) {
             res.sendError(statusCode);
         } else {
+            // mem: forward to the same URI may cause infinite loop
             req.getRequestDispatcher(req.getRequestURI()).forward(req, res);
         }
     }

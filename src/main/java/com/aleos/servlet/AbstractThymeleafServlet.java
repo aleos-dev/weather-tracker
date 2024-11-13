@@ -51,15 +51,15 @@ public class AbstractThymeleafServlet extends HttpServlet {
         super.init(config);
         log.info("Initializing AbstractThymeleafServlet");
 
-        templateEngine = retrieveTemplateEngine(config);
-        serviceLocator = retrieveServiceLocator(config);
+        templateEngine = retrieveTemplateEngine();
+        serviceLocator = retrieveServiceLocator();
     }
 
     protected void processTemplate(String template, HttpServletRequest req, HttpServletResponse res) {
         log.debug("Processing template: {}", template);
-        try {
+        try (var printWriter = res.getWriter()) {
             var ctx = buildWebContext(req, res);
-            templateEngine.process(template, ctx, res.getWriter());
+            templateEngine.process(template, ctx, printWriter);
             log.info("Template {} processed successfully", template);
         } catch (IOException e) {
             throw new ResponseWritingException("Failed to write response for template: %s".formatted(template), e);
@@ -152,10 +152,9 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    private ITemplateEngine retrieveTemplateEngine(ServletConfig config) {
+    private ITemplateEngine retrieveTemplateEngine() {
         log.debug("Retrieving TemplateEngine from ServletConfig");
-        var obj = config.getServletContext()
-                .getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
+        var obj = getServletContext().getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
 
         if (obj instanceof ITemplateEngine templateEngineObj) {
             return templateEngineObj;
@@ -164,9 +163,9 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    private ServiceLocator retrieveServiceLocator(ServletConfig config) {
+    private ServiceLocator retrieveServiceLocator() {
         log.debug("Retrieving ServiceLocator from ServletConfig");
-        var obj = config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
+        var obj = getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
 
         if (obj instanceof ServiceLocator serviceLocatorObj) {
             return serviceLocatorObj;
