@@ -108,11 +108,15 @@ public class LocationServlet extends AbstractThymeleafServlet {
     }
 
     private double parseCoordinate(String key, HttpServletRequest req) {
+        String param = req.getParameter(key);
+        if (param == null || param.isEmpty()) {
+            throw new CoordinateParsingException("Coordinate " + key + " is missing.");
+        }
+
         try {
-            return Double.parseDouble(req.getParameter(key));
-        } catch (NumberFormatException | NullPointerException e) {
-            throw new CoordinateParsingException(
-                    "Invalid %s coordinate parameter: %s.".formatted(key, req.getParameter(key)), e);
+            return Double.parseDouble(param);
+        } catch (NumberFormatException e) {
+            throw new CoordinateParsingException("Coordinate " + key + " must be a valid number.", e);
         }
     }
 
