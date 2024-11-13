@@ -14,9 +14,7 @@ public class SignOutServlet extends AbstractThymeleafServlet {
         if (getSessionContext(req).isAuthenticated()) {
 
             signOutSession(req);
-
             sendRedirect(WELCOME_URI, res);
-            processTemplate("welcome", req, res);
 
         } else {
             sendRedirect(AUTH_URI, res);
