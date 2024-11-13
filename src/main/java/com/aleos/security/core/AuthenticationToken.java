@@ -7,8 +7,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
+/**
+ * Represents an authentication token that holds the authentication principal, authorities,
+ * and authentication status.
+ * <p>
+ * This class implements the Authentication interface and provides the necessary methods
+ * to work with authentication data within security contexts.
+ * <p>
+ * The {@code AuthenticationToken} can be created with a principal, a collection of granted authorities,
+ * and an authentication status. It can also determine if it represents an anonymous user.
+ */
 @JsonIgnoreProperties("anonymous")
 public class AuthenticationToken implements Authentication {
 
@@ -27,7 +38,7 @@ public class AuthenticationToken implements Authentication {
             @JsonProperty("authorities") List<GrantedAuthority> authorities,
             @JsonProperty("authenticated") boolean authenticated) {
         this.principal = principal;
-        this.authorities = authorities;
+        this.authorities = Collections.unmodifiableList(authorities);
         this.authenticated = authenticated;
     }
 
@@ -48,12 +59,12 @@ public class AuthenticationToken implements Authentication {
     }
 
     @Override
-    public boolean setAuthenticated() {
+    public boolean isAuthenticated() {
         return authenticated;
     }
 
     @Override
-    public void setAuthenticated(boolean isAuthenticated) {
+    public void isAuthenticated(boolean isAuthenticated) {
         this.authenticated = isAuthenticated;
     }
 

@@ -10,6 +10,15 @@ import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * CharacterEncodingFilter is a servlet filter that ensures requests and responses
+ * have a consistent character encoding. Specifically, it sets the encoding to UTF-8
+ * for requests and responses targeting URLs that start with "/api". Additionally,
+ * it sets the content type for such responses to "text/html; charset=UTF-8".
+ * <p>
+ * Inherits the functionality from HttpFilter to participate in the filter chain,
+ * allowing other filters to execute either before or after this filter as required.
+ */
 public class CharacterEncodingFilter extends HttpFilter {
 
     @Override

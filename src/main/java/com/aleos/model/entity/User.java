@@ -15,6 +15,13 @@ import java.util.Set;
 import static jakarta.persistence.CascadeType.*;
 
 
+/**
+ * The User class represents a user entity in the system.
+ * It is mapped to the "users" table in the database.
+ * This class implements Serializable interface for object serialization.
+ * The class utilizes JPA annotations for ORM mapping and validation annotations
+ * to ensure data integrity.
+ */
 @Entity
 @Table(name = "users")
 @Getter

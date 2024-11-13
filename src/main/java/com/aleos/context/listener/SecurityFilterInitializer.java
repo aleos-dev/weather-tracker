@@ -6,6 +6,12 @@ import com.aleos.context.servicelocator.ServiceLocator;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
+/**
+ * SecurityFilterInitializer is a listener that initializes security filters
+ * during the web application's startup phase. It implements the
+ * ServletContextListener interface and overrides the contextInitialized method
+ * to set up the security context using a given ServiceLocator.
+ */
 public class SecurityFilterInitializer implements ServletContextListener {
 
     @Override

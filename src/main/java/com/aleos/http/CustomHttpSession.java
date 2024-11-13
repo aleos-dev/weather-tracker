@@ -6,6 +6,13 @@ import java.io.Serializable;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Interface representing a custom HTTP session.
+ * <p>
+ * A CustomHttpSession provides mechanisms to manage session attributes,
+ * track authentication status, and manage session lifecycle events such
+ * as invalidation and access time updates.
+ */
 public interface CustomHttpSession extends Serializable {
 
         String SESSION_CONTEXT_KEY = "SESSION_CONTEXT";

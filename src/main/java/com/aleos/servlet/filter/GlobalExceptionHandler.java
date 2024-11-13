@@ -1,6 +1,6 @@
 package com.aleos.servlet.filter;
 
-import com.aleos.exception.WeatherClientException;
+import com.aleos.exception.service.WeatherClientException;
 import com.aleos.exception.repository.UniqueConstraintViolationException;
 import com.aleos.exception.security.ResourceNotFoundException;
 import com.aleos.exception.servlet.CoordinateParsingException;
@@ -18,9 +18,27 @@ import static com.aleos.servlet.AbstractThymeleafServlet.ERROR_ATTRIBUTE_KEY;
 import static jakarta.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
+/**
+ * A global exception handler filter for managing and logging exceptions
+ * occurring during HTTP request processing.
+ * <p>
+ * This class extends {@link HttpFilter} and overrides the {@code doFilter} method
+ * to intercept requests and handle various types of exceptions.
+ */
 @Slf4j
 public class GlobalExceptionHandler extends HttpFilter {
 
+    /**
+     * Intercepts HTTP requests and processes them through the filter chain.
+     * Handles various types of exceptions that may occur during request processing,
+     * and sets appropriate status codes and error messages in the response.
+     *
+     * @param req the HttpServletRequest object that contains the request the client made to the servlet
+     * @param res the HttpServletResponse object that contains the response the servlet returns to the client
+     * @param chain the FilterChain for invoking the next filter or the resource
+     * @throws IOException if an input or output error occurs while the filter is processing the request
+     * @throws ServletException if the request could not be handled
+     */
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         try {

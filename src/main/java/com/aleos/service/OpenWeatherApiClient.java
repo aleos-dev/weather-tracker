@@ -1,7 +1,7 @@
 package com.aleos.service;
 
 import com.aleos.context.Properties;
-import com.aleos.exception.WeatherClientException;
+import com.aleos.exception.service.WeatherClientException;
 import com.aleos.model.WeatherApiResponse;
 import com.aleos.model.entity.Location;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +21,16 @@ import java.util.List;
 import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static jakarta.servlet.http.HttpServletResponse.SC_OK;
 
+/**
+ * The OpenWeatherApiClient class implements the WeatherApiClient interface to interact with
+ * the OpenWeatherMap API, providing methods to search locations by name and retrieve weather data
+ * for specific coordinates.
+ * <ul>
+ *     <li>Uses HttpClient for making HTTP requests.</li>
+ *     <li>Utilizes ObjectMapper for JSON processing.</li>
+ *     <li>Properties class is used to load configuration parameters.</li>
+ * </ul>
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class OpenWeatherApiClient implements WeatherApiClient {
@@ -36,6 +46,12 @@ public class OpenWeatherApiClient implements WeatherApiClient {
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Searches for locations matching the given name.
+     *
+     * @param locationName the name of the location to search for; must be non-null and non-empty.
+     * @return a list of Location objects that match the given name.
+     */
     @Override
     public List<Location> searchLocationByName(String locationName) {
         log.info("Searching location by name: {}", locationName);
@@ -51,6 +67,14 @@ public class OpenWeatherApiClient implements WeatherApiClient {
         return parseLocations(response.body());
     }
 
+    /**
+     * Fetches the weather information for a given geographic location specified
+     * by longitude and latitude.
+     *
+     * @param longitude the geographic longitude of the location
+     * @param latitude  the geographic latitude of the location
+     * @return a {@code WeatherApiResponse} containing the weather details for the given location
+     */
     @Override
     public WeatherApiResponse getWeatherByLocation(double longitude, double latitude) {
         log.info("Fetching weather for coordinates: lon={}, lat={}", longitude, latitude);

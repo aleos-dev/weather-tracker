@@ -8,6 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * WeatherServlet is a web servlet responsible for handling HTTP requests related to weather data.
+ * It leverages Thymeleaf for template processing and utilizes UserService to fetch weather information.
+ */
 @Slf4j
 @WebServlet("/api/v1/weather")
 public class WeatherServlet extends AbstractThymeleafServlet {
@@ -22,6 +26,12 @@ public class WeatherServlet extends AbstractThymeleafServlet {
         log.info("WeatherServlet initialized with UserService");
     }
 
+    /**
+     * Handles the HTTP GET requests to retrieve weather data for the authenticated user.
+     *
+     * @param req the HttpServletRequest object containing the client's request
+     * @param res the HttpServletResponse object containing the servlet's response
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
         var username = retrieveAuthenticationPrincipal(req);

@@ -11,6 +11,24 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.WebApplicationTemplateResolver;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
+/**
+ * Initializes and configures a Thymeleaf Template Engine within a ServletContext.
+ * <p>
+ * This class implements the ServletContextListener interface and prepares the
+ * Thymeleaf Template Engine when the servlet context is initialized. It sets various
+ * properties of the template engine such as template mode, prefix, suffix, character encoding,
+ * and cache settings. The initialized engine is then stored in the servlet context for
+ * later retrieval and use in rendering templates.
+ * <p>
+ * The class also handles exceptions that occur during the initialization process,
+ * logging relevant error messages and throwing a TemplateEngineInitializationException.
+ * <p>
+ * Key Points:
+ * - Implements ServletContextListener to hook into the servlet context lifecycle.
+ * - Configures the Template Engine with settings like template mode, prefix, suffix, encoding, and caching.
+ * - Stores the initialized Template Engine in the servlet context under a specific key.
+ * - Handles and logs exceptions that occur during initialization.
+ */
 public class TemplateEngineInitializer implements ServletContextListener {
 
     public static final Logger logger = LoggerFactory.getLogger(TemplateEngineInitializer.class);

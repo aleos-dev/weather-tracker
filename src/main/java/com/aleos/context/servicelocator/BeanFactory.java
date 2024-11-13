@@ -8,6 +8,34 @@ import java.lang.reflect.Parameter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * The BeanFactory class functions as a service locator and bean container, allowing for
+ * the registration, initialization, and retrieval of beans based on a configuration class.
+ * It implements the ServiceLocator interface to provide methods for managing beans.
+ * <p>
+ * Fields:
+ * - BEAN_FACTORY_CONTEXT_KEY: A constant key used for storing the BeanFactory instance in a context.
+ * - beans: A concurrent map containing the registered beans, keyed by their context key.
+ * <p>
+ * Constructor:
+ * - BeanFactory(Class<?> configClass): Constructs a BeanFactory and initializes beans based on the
+ * provided configuration class.
+ * <p>
+ * Methods:
+ * - getBean(Class<T> contextKey): Retrieves an instance of the bean associated with the given context key.
+ * - registerBean(Class<?> contextKey, Object obj): Registers a new bean with the specified context key.
+ * <p>
+ * Private Methods:
+ * - registerBean(String contextKey, Object obj): Registers a bean internally with a string context key.
+ * - initializeBeans(Class<?> configClass): Initializes beans using methods annotated with @Bean in the
+ * provided configuration class.
+ * - determineBeanContextKey(Bean beanAnnotation, Method method): Determines the context key for a bean
+ * based on its annotation and method name.
+ * - resolveMethodParameters(Method method): Resolves and returns the parameters required for invoking the
+ * specified method.
+ * - static boolean isCycle(int retriesCount, int methodsCount): Checks if a cyclic dependency is detected
+ * based on the retry count and the total number of methods.
+ */
 public class BeanFactory implements ServiceLocator {
 
     public static final String BEAN_FACTORY_CONTEXT_KEY = "BEAN_FACTORY_CONTEXT_KEY";

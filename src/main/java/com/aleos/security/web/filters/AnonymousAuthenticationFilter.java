@@ -16,6 +16,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+/**
+ * A filter that ensures a user is authenticated anonymously if no existing authentication is present.
+ * <p>
+ * This filter checks the current security context for an existing authentication. If none is found,
+ * it sets an anonymous authentication context.
+ */
 public class AnonymousAuthenticationFilter extends HttpFilter {
 
     public static final String ANONYMOUS_USER = "Anonymous";
@@ -48,7 +54,7 @@ public class AnonymousAuthenticationFilter extends HttpFilter {
 
     private Authentication createAuthentication() {
         var authToken = new AuthenticationToken(ANONYMOUS_USER, new SimpleGrantedAuthority(Role.ANONYMOUS));
-        authToken.setAuthenticated(false);
+        authToken.isAuthenticated(false);
         return authToken;
     }
 }

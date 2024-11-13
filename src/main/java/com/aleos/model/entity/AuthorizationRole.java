@@ -9,6 +9,10 @@ import org.hibernate.annotations.NaturalId;
 
 import java.io.Serializable;
 
+/**
+ * Represents an authorization role entity containing a unique role identifier and a role type.
+ * This entity is stored in the "authorization_role" table.
+ */
 @Entity
 @Table(name = "authorization_role")
 @EqualsAndHashCode(of = "role")

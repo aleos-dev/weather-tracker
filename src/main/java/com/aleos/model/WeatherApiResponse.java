@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
+/**
+ * Represents the response from a weather API containing various weather-related data.
+ */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WeatherApiResponse {

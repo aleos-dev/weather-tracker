@@ -14,6 +14,19 @@ import jakarta.validation.Validator;
 
 import java.util.Optional;
 
+/**
+ * The SignUpServlet class handles user registration by processing HTTP GET and POST requests.
+ * It extends the AbstractAuthServlet to utilize its authentication-related functionalities.
+ * <p>
+ * The servlet initializes necessary services for user registration, including validation,
+ * registration handling, and email communication.
+ * <p>
+ * On HTTP GET requests, it displays the sign-up page.
+ * <p>
+ * On HTTP POST requests, it validates the user-provided registration details. If the validation
+ * is successful, it proceeds to register the user and sends a verification email. If validation fails,
+ * it re-renders the sign-up page with the corresponding error messages.
+ */
 @WebServlet("/api/v1/sign-up")
 public class SignUpServlet extends AbstractAuthServlet {
 
@@ -23,17 +36,41 @@ public class SignUpServlet extends AbstractAuthServlet {
     private transient RegistrationService registrationService;
     private transient EmailService emailService;
 
+    /**
+     * Initializes the SignUpServlet by configuring initial state and services.
+     *
+     * @param config the ServletConfig that provides configuration information for this servlet
+     * @throws ServletException if an exception occurs that interrupts the servlet's normal operation
+     */
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         initializeServices();
     }
 
+    /**
+     * Handles HTTP GET requests. This method is invoked when a user sends a GET request
+     * to the servlet. It renders the sign-up page.
+     *
+     * @param req  the HttpServletRequest object that contains the request the client
+     *             has made to the servlet.
+     * @param res  the HttpServletResponse object that contains the response the
+     *             servlet sends to the client.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
         renderSignUpPage(req, res);
     }
 
+    /**
+     * Handles the POST request for user registration.
+     * This method processes the user sign-up by validating the input payload,
+     * updating request attributes, and rendering appropriate views based on
+     * validation results.
+     *
+     * @param req the HttpServletRequest containing the user input data
+     * @param res the HttpServletResponse used to send responses
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         if (hasNoErrorAttribute(req)) {

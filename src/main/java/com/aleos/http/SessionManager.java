@@ -20,6 +20,10 @@ import java.util.UUID;
 import static com.aleos.http.CustomHttpSessionImpl.AUTH_SESSION_KEY;
 import static org.slf4j.LoggerFactory.*;
 
+/**
+ * Manages HTTP sessions by creating, validating, saving, and removing sessions.
+ * Utilizes Redis for session storage and handles session cookies.
+ */
 @RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SessionManager {
@@ -38,6 +42,13 @@ public class SessionManager {
     private final JedisPool jedisPool;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Creates a new HTTP session, generates a unique session ID, creates a session ID cookie,
+     * and returns the newly created session.
+     *
+     * @param res the HttpServletResponse object used to add the session ID cookie.
+     * @return a new instance of CustomHttpSession with a unique session ID.
+     */
     public CustomHttpSession createSession(HttpServletResponse res) {
         UUID sessionId = generateSessionId();
         CustomHttpSession session = new CustomHttpSessionImpl(sessionId);
@@ -47,6 +58,16 @@ public class SessionManager {
         return session;
     }
 
+    /**
+     * Retrieves a valid HTTP session based on the session ID extracted from the request's cookies.
+     * If the session does not exist, the session cookie is invalidated.
+     * If the session exists but is not valid, the session is removed and the session cookie is invalidated.
+     * If the session is valid, its last accessed time is updated.
+     *
+     * @param req the HttpServletRequest containing the client's request data
+     * @param res the HttpServletResponse for sending the response to the client
+     * @return an Optional containing the valid CustomHttpSession if found, or an empty Optional otherwise
+     */
     public Optional<CustomHttpSession> getValidSession(HttpServletRequest req, HttpServletResponse res) {
         return getSessionIdFromCookie(req).flatMap(sessionId -> {
 
@@ -70,6 +91,11 @@ public class SessionManager {
         });
     }
 
+    /**
+     * Saves the provided custom HTTP session to Redis storage.
+     *
+     * @param session the custom HTTP session to be saved; must not be null
+     */
     public void saveSessionToRedis(CustomHttpSession session) {
         try (Jedis jedis = jedisPool.getResource()) {
             serializeSession(session).ifPresent(sessionData ->
@@ -77,6 +103,12 @@ public class SessionManager {
         }
     }
 
+    /**
+     * Retrieves a session by its ID from Redis.
+     *
+     * @param sessionId the unique identifier of the session
+     * @return the CustomHttpSession object if found, otherwise null
+     */
     public CustomHttpSession getSession(UUID sessionId) {
         try (Jedis jedis = jedisPool.getResource()) {
             String sessionData = jedis.get(sessionId.toString());
@@ -87,6 +119,11 @@ public class SessionManager {
         }
     }
 
+    /**
+     * Removes the session associated with the given session ID from the Redis store.
+     *
+     * @param sessionId the unique identifier of the session to be removed
+     */
     public void removeSession(UUID sessionId) {
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.del(sessionId.toString());

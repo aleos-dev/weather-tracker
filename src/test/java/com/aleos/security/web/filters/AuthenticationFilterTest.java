@@ -127,7 +127,7 @@ class AuthenticationFilterTest {
 
     private static Stream<Arguments> absentAuthenticationData() {
         AuthenticationToken notAuthenticatedToken = mock(AuthenticationToken.class);
-        when(notAuthenticatedToken.setAuthenticated()).thenReturn(false);
+        when(notAuthenticatedToken.isAuthenticated()).thenReturn(false);
 
         AuthenticationToken anonymousToken = mock(AuthenticationToken.class);
         when(anonymousToken.isAnonymous()).thenReturn(true);
