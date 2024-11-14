@@ -26,6 +26,8 @@ jobs:
       - name: Run Tests
         run: |
           mvn -B clean test \
+            -DREDIS_HOST=TEST \
+            -DREDIS_PORT=4444 \
             -DWEATHER_TRACKER_DB_URL=TEST \
             -DWEATHER_TRACKER_DB_USER=TEST \
             -DWEATHER_TRACKER_DB_PASSWORD=TEST \
