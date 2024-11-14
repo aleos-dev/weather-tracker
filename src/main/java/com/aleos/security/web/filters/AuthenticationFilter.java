@@ -18,6 +18,40 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * Filter responsible for handling authentication by processing
+ * credentials and managing user sessions.
+ * <p>
+ * This filter intercepts HTTP requests, checks for authentication,
+ * and authenticates the user based on the supplied credentials if necessary.
+ * <p>
+ * Methods:
+ * - `doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain)`:
+ * Processes the request, performs authentication, and either forwards to the
+ * authentication URI in case of failure or proceeds with the filter chain.
+ * <p>
+ * - `restoreAuthenticationFromSession(HttpServletRequest req)`:
+ * Retrieves the authentication details from the session and sets it in
+ * the security context.
+ * <p>
+ * - `getCustomHttpSession(HttpServletRequest req)`:
+ * Retrieves the custom HTTP session from the request.
+ * <p>
+ * - `isNotAuthenticated(Authentication auth)`:
+ * Checks if the user is not authenticated.
+ * <p>
+ * - `isAuthRequest(HttpServletRequest req)`:
+ * Checks if the incoming request matches the authentication method and URI.
+ * <p>
+ * - `setOriginalRequestInSession(HttpServletRequest req)`:
+ * Stores the original request URI in the session.
+ * <p>
+ * - `authenticateUser(String username, String password)`:
+ * Authenticates the user with the provided username and password.
+ * <p>
+ * - `saveAuthenticationToSession(HttpServletRequest req)`:
+ * Saves the authentication details to the session.
+ */
 @AllArgsConstructor
 public class AuthenticationFilter extends HttpFilter {
 
@@ -70,7 +104,7 @@ public class AuthenticationFilter extends HttpFilter {
     }
 
     private static boolean isNotAuthenticated(Authentication auth) {
-        return auth == null || auth.isAnonymous() || !auth.setAuthenticated();
+        return auth == null || auth.isAnonymous() || !auth.isAuthenticated();
     }
 
     private static boolean isAuthRequest(HttpServletRequest req) {

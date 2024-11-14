@@ -6,6 +6,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+/**
+ * Utility class for managing application properties.
+ * <p>
+ * This class loads properties from a file and overrides them with system or environment variables
+ * if available. The properties can be accessed using the static {@link #get(String)} method.
+ * <p>
+ * The properties file is expected to be in the classpath as "/application.properties".
+ * Properties that can be loaded include database connection details, email service settings,
+ * weather API keys, and Redis configuration.
+ * <p>
+ * Throws a {@link PropertiesLoadingException} if the properties file is not found, can't be loaded,
+ * or if a required property is not set.
+ */
 public class Properties {
 
     private static final java.util.Properties props = new java.util.Properties();

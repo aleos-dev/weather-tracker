@@ -11,6 +11,11 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Objects;
 
+/**
+ * Represents the composite primary key for the UserLocation entity, defining a many-to-many
+ * relationship between User and Location entities.
+ * The class implements the Serializable interface to allow instances to be serialized.
+ */
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor

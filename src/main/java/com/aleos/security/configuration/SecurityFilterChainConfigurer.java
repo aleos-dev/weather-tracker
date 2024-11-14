@@ -7,6 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The SecurityFilterChainConfigurer class is responsible for configuring a security filter chain.
+ * It provides methods to add filters, set URL patterns, and build the filter chain.
+ */
 @Slf4j
 public class SecurityFilterChainConfigurer {
 

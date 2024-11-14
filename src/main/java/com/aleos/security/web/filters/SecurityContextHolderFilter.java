@@ -13,6 +13,11 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 import java.util.function.Supplier;
 
+/**
+ * The SecurityContextHolderFilter class is responsible for managing the security context for each HTTP request.
+ * It extends the HttpFilter class and is used to ensure that the security context is properly set and cleared
+ * during the request processing life cycle.
+ */
 @AllArgsConstructor
 public class SecurityContextHolderFilter extends HttpFilter {
 

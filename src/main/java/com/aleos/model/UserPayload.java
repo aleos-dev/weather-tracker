@@ -7,6 +7,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Represents the payload for a user containing essential information such as username,
+ * password, and email. This class is immutable and is used for validating user input
+ * data during user registration.
+ */
 @Getter
 @RequiredArgsConstructor
 public class UserPayload {

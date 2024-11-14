@@ -13,6 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+/**
+ * ExceptionTranslationFilter is a custom filter that handles specific types of exceptions
+ * occurring during the filtering process in an HTTP request-response cycle.
+ * <p>
+ * This class extends HttpFilter and is designed to catch and process AuthenticationException
+ * and AccessDeniedException. Depending on the type of exception, it either redirects the
+ * user to a login page or sends an HTTP 403 "Access Denied" error.
+ */
 public class ExceptionTranslationFilter extends HttpFilter {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ExceptionTranslationFilter.class);
@@ -30,7 +38,7 @@ public class ExceptionTranslationFilter extends HttpFilter {
 
         } catch (AccessDeniedException e) {
             var authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.setAuthenticated()) {
+            if (authentication != null && authentication.isAuthenticated()) {
                 logger.debug("User not have access to resource");
                 res.sendError(403, "Access Denied");
             } else {

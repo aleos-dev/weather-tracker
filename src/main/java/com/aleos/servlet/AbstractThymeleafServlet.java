@@ -31,6 +31,14 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * An abstract servlet for handling HTTP requests and rendering Thymeleaf templates.
+ * <p>
+ * This servlet provides several utility methods to ease template processing,
+ * DTO parsing, payload validation, and error handling in derived servlets.
+ * <p>
+ * Logging is used extensively for tracing and debugging purposes.
+ */
 @Slf4j
 public class AbstractThymeleafServlet extends HttpServlet {
 
@@ -51,21 +59,36 @@ public class AbstractThymeleafServlet extends HttpServlet {
         super.init(config);
         log.info("Initializing AbstractThymeleafServlet");
 
-        templateEngine = retrieveTemplateEngine(config);
-        serviceLocator = retrieveServiceLocator(config);
+        templateEngine = retrieveTemplateEngine();
+        serviceLocator = retrieveServiceLocator();
     }
 
+    /**
+     * Processes the given template and writes the output to the HTTP response.
+     *
+     * @param template the name of the template to process
+     * @param req the {@code HttpServletRequest} object that contains the request the client made to the servlet
+     * @param res the {@code HttpServletResponse} object that contains the response the servlet returns to the client
+     * @throws ResponseWritingException if there is an error writing the response
+     */
     protected void processTemplate(String template, HttpServletRequest req, HttpServletResponse res) {
         log.debug("Processing template: {}", template);
-        try {
+        try (var printWriter = res.getWriter()) {
             var ctx = buildWebContext(req, res);
-            templateEngine.process(template, ctx, res.getWriter());
+            templateEngine.process(template, ctx, printWriter);
             log.info("Template {} processed successfully", template);
         } catch (IOException e) {
             throw new ResponseWritingException("Failed to write response for template: %s".formatted(template), e);
         }
     }
 
+    /**
+     * Parses a simple Data Transfer Object (DTO) from the given HTTP servlet request.
+     *
+     * @param dtoClass the class of the DTO to be parsed
+     * @param req the HTTP servlet request containing the data for the DTO
+     * @return an instance of the parsed DTO
+     */
     protected <T> T parseSimpleDto(Class<T> dtoClass, HttpServletRequest req) {
         log.debug("Parsing DTO for class: {}", dtoClass.getSimpleName());
         Field[] fields = dtoClass.getDeclaredFields();
@@ -78,6 +101,14 @@ public class AbstractThymeleafServlet extends HttpServlet {
         return dtoInstance;
     }
 
+    /**
+     * Validates the given input payload using the provided payload validator.
+     *
+     * @param payloadValidator the validator to use for validating the payload
+     * @param inputPayload the payload object to be validated
+     * @param <T> the type of the payload
+     * @return an Optional containing ErrorDetails if there are validation violations, or an empty Optional if the payload is valid
+     */
     protected <T> Optional<ErrorDetails> validatePayload(Validator payloadValidator, T inputPayload) {
         log.debug("Validating payload of type: {}", inputPayload.getClass().getSimpleName());
         Set<ConstraintViolation<T>> constraintViolations = payloadValidator.validate(inputPayload);
@@ -96,6 +127,13 @@ public class AbstractThymeleafServlet extends HttpServlet {
                 ));
     }
 
+    /**
+     * Sends an HTTP redirect response to the specified URL.
+     *
+     * @param redirectUrl the URL to redirect to.
+     * @param res the HttpServletResponse object to use for sending the redirect.
+     * @throws RedirectException if an IOException occurs during the redirect process.
+     */
     protected void sendRedirect(String redirectUrl, HttpServletResponse res) {
         log.info("Sending redirect to URL: {}", redirectUrl);
         try {
@@ -106,24 +144,57 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Renders an error page with the provided error message.
+     *
+     * @param req the HttpServletRequest object that contains the request the client made to the servlet
+     * @param res the HttpServletResponse object that contains the response the servlet returns to the client
+     * @param errorMessage the message to be displayed on the error page
+     */
     protected void renderErrorPage(HttpServletRequest req, HttpServletResponse res, String errorMessage) {
         log.warn("Rendering error page with message: {}", errorMessage);
         req.setAttribute(ERROR_ATTRIBUTE_KEY, ErrorDetails.fromSingleError(errorMessage));
         processTemplate(ERROR_PAGE_TEMPLATE, req, res);
     }
 
+    /**
+     * Retrieves the session context for the given HTTP servlet request.
+     *
+     * @param req the HttpServletRequest object from which the session context is retrieved
+     * @return the CustomHttpSession object associated with the given request
+     */
     protected CustomHttpSession getSessionContext(HttpServletRequest req) {
         return (CustomHttpSession) req.getAttribute(CustomHttpSession.SESSION_CONTEXT_KEY);
     }
 
+    /**
+     * Retrieves the authentication principal from the HTTP servlet request.
+     *
+     * @param req the HttpServletRequest object from which to retrieve the authentication principal.
+     * @return the authentication principal as a String.
+     */
     protected String retrieveAuthenticationPrincipal(HttpServletRequest req) {
         return getSessionContext(req).getPrincipal();
     }
 
+    /**
+     * Checks if the given HttpServletRequest does not contain an attribute
+     * associated with errors.
+     *
+     * @param req the HttpServletRequest to be checked for the error attribute.
+     * @return true if no error attribute is present, false otherwise.
+     */
     protected boolean hasNoErrorAttribute(HttpServletRequest req) {
         return req.getAttribute(ERROR_ATTRIBUTE_KEY) == null;
     }
 
+    /**
+     * Builds and returns a WebContext based on the given HttpServletRequest and HttpServletResponse.
+     *
+     * @param req the HttpServletRequest object that contains the request the client made to the servlet
+     * @param res the HttpServletResponse object that contains the response the servlet returns to the client
+     * @return a WebContext object built based on the provided request and response
+     */
     protected WebContext buildWebContext(HttpServletRequest req, HttpServletResponse res) {
         JakartaServletWebApplication application = JakartaServletWebApplication.buildApplication(req.getServletContext());
 
@@ -152,10 +223,9 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    private ITemplateEngine retrieveTemplateEngine(ServletConfig config) {
+    private ITemplateEngine retrieveTemplateEngine() {
         log.debug("Retrieving TemplateEngine from ServletConfig");
-        var obj = config.getServletContext()
-                .getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
+        var obj = getServletContext().getAttribute(TemplateEngineInitializer.TEMPLATE_ENGINE_CONTEXT_KEY);
 
         if (obj instanceof ITemplateEngine templateEngineObj) {
             return templateEngineObj;
@@ -164,9 +234,9 @@ public class AbstractThymeleafServlet extends HttpServlet {
         }
     }
 
-    private ServiceLocator retrieveServiceLocator(ServletConfig config) {
+    private ServiceLocator retrieveServiceLocator() {
         log.debug("Retrieving ServiceLocator from ServletConfig");
-        var obj = config.getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
+        var obj = getServletContext().getAttribute(BeanFactory.BEAN_FACTORY_CONTEXT_KEY);
 
         if (obj instanceof ServiceLocator serviceLocatorObj) {
             return serviceLocatorObj;

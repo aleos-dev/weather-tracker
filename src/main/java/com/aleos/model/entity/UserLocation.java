@@ -10,6 +10,11 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * The UserLocation class represents the mapping between a user and a location.
+ * It is a JPA entity mapped to a "user_location" table in the database.
+ * This class uses a composite key defined by the UserLocationId class.
+ */
 @Entity
 @Table(
         name = "user_location",

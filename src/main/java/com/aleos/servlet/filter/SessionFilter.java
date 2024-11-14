@@ -14,6 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+/**
+ * The SessionFilter class is responsible for managing HTTP session operations.
+ * It initializes the session manager and handles HTTP request filtering by managing session validity.
+ * <p>
+ * This filter ensures each incoming HTTP request has a valid session. If a valid session is not found,
+ * a new session is created. The filter also saves the session back to the Redis store if applicable.
+ */
 @Slf4j
 public class SessionFilter extends HttpFilter {
 
@@ -21,6 +28,14 @@ public class SessionFilter extends HttpFilter {
 
     private transient SessionManager manager;
 
+    /**
+     * Initializes the SessionFilter with the necessary SessionManager dependency.
+     * This method retrieves the ServiceLocator from the servlet context and obtains
+     * the SessionManager bean required for session management.
+     *
+     * @param config The FilterConfig object that contains the filter's configuration
+     *               and initialization parameters.
+     */
     @Override
     public void init(FilterConfig config) {
         log.info("Initializing SessionFilter with SessionManager dependency");
@@ -28,6 +43,17 @@ public class SessionFilter extends HttpFilter {
         manager = locator.getBean(SessionManager.class);
     }
 
+    /**
+     * Filters incoming requests to ensure that a valid session is present.
+     * If a valid session is not found, it creates a new session.
+     * Sessions pertaining to application resources are saved after request processing.
+     *
+     * @param req   The HttpServletRequest object that contains the request the client made to the servlet.
+     * @param res   The HttpServletResponse object that contains the response the servlet sends to the client.
+     * @param chain The FilterChain for invoking the next filter or servlet in the chain.
+     * @throws ServletException If the request could not be handled.
+     * @throws IOException      If an input or output error occurred while the filter was handling the request.
+     */
     @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
         log.debug("Processing request: {} {}", req.getMethod(), req.getRequestURI());

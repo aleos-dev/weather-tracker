@@ -16,6 +16,14 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+/**
+ * LocationServlet handles HTTP requests related to user locations.
+ * It allows users to add, remove, update, and search for locations,
+ * while interfacing with a weather API and user service.
+ * <p>
+ * This servlet is mapped to "/api/v1/locations" and supports GET, POST,
+ * DELETE, and PATCH HTTP methods.
+ */
 @Slf4j
 @MultipartConfig
 @WebServlet("/api/v1/locations")
@@ -49,6 +57,13 @@ public class LocationServlet extends AbstractThymeleafServlet {
         }
     }
 
+    /**
+     * Handles GET requests for locations by querying the weather client and
+     * processing the results into a template.
+     *
+     * @param req HttpServletRequest object that contains the request the client has made to the servlet.
+     * @param res HttpServletResponse object that contains the response the servlet sends to the client.
+     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res) {
         log.info("Handling GET request for locations");
@@ -60,6 +75,12 @@ public class LocationServlet extends AbstractThymeleafServlet {
         processTemplate("weather", req, res);
     }
 
+    /**
+     * Handles POST requests to add a location for a user.
+     *
+     * @param req the HttpServletRequest containing the request parameters such as "lon" and "lat"
+     * @param res the HttpServletResponse used to redirect the user after processing the request
+     */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse res) {
         String username = retrieveAuthenticationPrincipal(req);
@@ -79,6 +100,12 @@ public class LocationServlet extends AbstractThymeleafServlet {
         sendRedirect("/api/v1/weather", res);
     }
 
+    /**
+     * Handles HTTP DELETE requests to remove a location for a specific user.
+     *
+     * @param req  the HttpServletRequest containing the client's request and parameters
+     * @param res  the HttpServletResponse used to send a response back to the client
+     */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse res) {
         String username = retrieveAuthenticationPrincipal(req);
@@ -93,6 +120,12 @@ public class LocationServlet extends AbstractThymeleafServlet {
         sendRedirect("/api/v1/weather", res);
     }
 
+    /**
+     * Handles the HTTP PATCH request to rename a location for a user.
+     *
+     * @param req the HttpServletRequest object that contains the request the client has made to the servlet
+     * @param res the HttpServletResponse object that contains the response the servlet sends to the client
+     */
     protected void doPatch(HttpServletRequest req, HttpServletResponse res) {
         String username = retrieveAuthenticationPrincipal(req);
         log.info("Handling PATCH request to rename location for user: {}", username);
@@ -108,11 +141,15 @@ public class LocationServlet extends AbstractThymeleafServlet {
     }
 
     private double parseCoordinate(String key, HttpServletRequest req) {
+        String param = req.getParameter(key);
+        if (param == null || param.isEmpty()) {
+            throw new CoordinateParsingException("Coordinate " + key + " is missing.");
+        }
+
         try {
-            return Double.parseDouble(req.getParameter(key));
-        } catch (NumberFormatException | NullPointerException e) {
-            throw new CoordinateParsingException(
-                    "Invalid %s coordinate parameter: %s.".formatted(key, req.getParameter(key)), e);
+            return Double.parseDouble(param);
+        } catch (NumberFormatException e) {
+            throw new CoordinateParsingException("Coordinate " + key + " must be a valid number.", e);
         }
     }
 

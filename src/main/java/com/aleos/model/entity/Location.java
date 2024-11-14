@@ -14,6 +14,11 @@ import java.util.Set;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
+/**
+ * Class representing a geographic location defined by its name and coordinates.
+ * This class is a JPA entity mapped to a database table with fields for name and coordinates.
+ * It also maintains a set of associated user locations.
+ */
 @Entity
 @Getter
 @Table(

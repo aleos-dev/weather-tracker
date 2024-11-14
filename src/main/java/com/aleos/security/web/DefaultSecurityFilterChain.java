@@ -8,6 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * The DefaultSecurityFilterChain class implements the SecurityFilterChain interface,
+ * providing a mechanism to match and apply a series of security filters to HTTP requests.
+ */
 @Slf4j
 public class DefaultSecurityFilterChain implements SecurityFilterChain {
 

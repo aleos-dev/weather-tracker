@@ -5,6 +5,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+/**
+ * A singleton supplier that ensures a single instance of the supplied object is created and accessed.
+ * <p>
+ * The {@code SingletonSupplier} class uses double-checked locking to ensure that the singleton
+ * instance is only created once and safely published across threads.
+ *
+ * @param <T> the type of object supplied by this supplier
+ */
 public class SingletonSupplier<T> implements Supplier<T> {
 
     private final Supplier<? extends T> instanceSupplier;

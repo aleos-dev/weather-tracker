@@ -7,11 +7,27 @@ import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * EmailService is responsible for handling all email-related operations
+ * required by the application, such as sending verification emails.
+ * <p>
+ * The service initializes email properties, configures SMTP sessions, and
+ * sends out emails using those configurations.
+ */
 @Slf4j
 public class EmailService {
     private static final String SENDER_EMAIL = "WEATHER_TRACKER_MAIL_SERVICE_SENDER";
     private static final String EMAIL_SERVICE_CODE = "WEATHER_TRACKER_MAIL_SERVICE_CODE";
 
+    /**
+     * Sends a verification email to the specified address with a provided verification URL.
+     * This method prepares the email properties, authenticates the session, and constructs
+     * the email message with the provided information before sending it.
+     *
+     * @param toEmail the recipient's email address
+     * @param verificationUrl the URL that the user must click to verify their account
+     * @throws EmailServiceException if the email cannot be sent due to a messaging issue
+     */
     public void sendVerificationEmail(String toEmail, String verificationUrl) {
         log.info("Preparing to send verification email to {}", toEmail);
 

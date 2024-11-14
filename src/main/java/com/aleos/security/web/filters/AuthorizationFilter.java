@@ -13,6 +13,12 @@ import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 
+/**
+ * The AuthorizationFilter class extends HttpFilter to enforce authorization checks
+ * on incoming HTTP requests. It uses an AuthorizationManager to verify if the request
+ * is permitted based on predefined authorization rules and the current authentication
+ * context.
+ */
 @AllArgsConstructor
 public class AuthorizationFilter extends HttpFilter {
 

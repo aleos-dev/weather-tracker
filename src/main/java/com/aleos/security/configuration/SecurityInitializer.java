@@ -15,12 +15,27 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Utility class to initialize security context and configure the security filter chain.
+ * <p>
+ * This class sets up various security filters for the application and defines authorization rules
+ * for different URL patterns.
+ */
 public final class SecurityInitializer {
 
     private SecurityInitializer() {
         throw new UnsupportedOperationException("Utility class");
     }
 
+    /**
+     * Initializes the security context by configuring and registering the security filter chain.
+     *
+     * This method sets up various security filters including authentication, authorization,
+     * and exception handling filters. It also applies the necessary authorization rules
+     * to the service locator and ensures the character encoding filter is conditionally applied.
+     *
+     * @param locator the ServiceLocator instance used to retrieve and register security-related beans.
+     */
     public static void initSecurityContext(ServiceLocator locator) {
         var configurer = new SecurityFilterChainConfigurer();
 
@@ -43,6 +58,15 @@ public final class SecurityInitializer {
         locator.registerBean(SecurityFilterChain.class, defaultSecurityFilterChain);
     }
 
+    /**
+     * Applies authorization rules to the provided ServiceLocator instance.
+     *
+     * This method sets up a mapping of URL paths to the roles that are authorized to access them.
+     * It then retrieves the AuthorizationManager from the provided ServiceLocator and adds the
+     * authorization rules to it.
+     *
+     * @param locator the ServiceLocator instance used to retrieve the AuthorizationManager
+     */
     private static void applyAuthorizationRules(ServiceLocator locator) {
         String baseUrl = Properties.get("base.url").orElse("/");
 

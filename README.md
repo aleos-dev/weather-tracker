@@ -27,6 +27,8 @@
 
 📖 [The Pattern used](#the-patterns-used)
 
+🛠 [Local Project Startup](#local-project-startup)
+
 🛠 [Deployment](#deployment)
 
 📋 [Project Requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/weather-viewer/)
@@ -67,14 +69,18 @@ width="50"><br>
     </td>
     <td align="middle">
         <img src="https://user-images.githubusercontent.com/25181517/183868728-b2e11072-00a5-47e2-8a4e-4ebbb2b8c554.png" width="50"><br>
-          CI/CD
+          CI|CD
     </td>
     <td align="middle">
           <img src="https://github.com/onemarc/tech-icons/blob/main/icons/postgressql-light.svg" width="50"><br>
             Postgresql
      </td>
     <td align="middle">
-          <img src=" https://www.flaticon.com/free-icon/integration_7001490" width="50"><br>
+        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/hibernate-dark.svg" width="50"><br>
+          Hibernate
+    </td>
+    <td align="middle">
+          <img src="https://cdn.iconscout.com/icon/premium/png-512-thumb/integration-testing-2010797-1693928.png?f=webp&w=512" width="50"><br>
             IT
      </td>
     <td align="middle">
@@ -92,10 +98,6 @@ width="50"><br>
     <td align="middle">
           <img src="https://github.com/onemarc/tech-icons/blob/main/icons%232/flyway.svg" width="50"><br>
             Flyway
-    </td>
-    <td align="middle">
-        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/hibernate-dark.svg" width="50"><br>
-          Hibernate
     </td>
     <td align="middle">
        <img src="https://github.com/onemarc/tech-icons/blob/main/icons/apachetomcat.svg" width="50"><br>
@@ -734,6 +736,7 @@ Several secrets are used within the CI/CD pipeline to ensure security:
 This CI/CD pipeline automates the build, release, and deployment process for the Tennis-Scoreboard application. Using
 GitHub Actions, Maven, and Tomcat, the system ensures that each new release is built and deployed to production with
 minimal manual intervention.
+
 ---
 
 ## Share your feedback
@@ -746,8 +749,7 @@ thoughts.
 
 ## Acknowledgments
 
-`I want to express my gratitude to the author of the `[technical requirements](https://zhukovsd.github.
-io/java-backend-learning-course/projects/weather-viewer/)
-` for this project, `[S. Zhukov](https://t.me/zhukovsd_it_mentor)`.
+`I want to express my gratitude to` [S. Zhukov](https://t.me/zhukovsd_it_mentor)`, the author of the` [technical
+requirements](https://zhukovsd.github.io/java-backend-learning-course/projects/weather-viewer).
 
 **Made with ☀️ and 🌧 by Aleos.**

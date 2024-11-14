@@ -14,11 +14,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * The AuthorizationManager class is responsible for managing the authorization of HTTP requests
+ * based on predefined authorization rules and the authenticated user's roles.
+ * <p>
+ * This class logs all the major steps of the authorization process and throws exceptions
+ * in cases where authorization or authentication fails.
+ */
 @Slf4j
 public class AuthorizationManager {
 
     private final Map<String, List<Role>> authorizationRules = new LinkedHashMap<>();
 
+    /**
+     * Checks the authorization of the current request based on the given authentication mechanism.
+     *
+     * @param req the HTTP request to be checked
+     * @param authentication a supplier that provides the current authentication details
+     * @return true if the request is authorized, false otherwise
+     * @throws AuthenticationException if authentication is required but not present or valid
+     */
     public boolean check(HttpServletRequest req, Supplier<Authentication> authentication) {
         var requestURI = req.getRequestURI();
         log.info("Checking authorization for request: {}", requestURI);
@@ -40,6 +55,12 @@ public class AuthorizationManager {
         return isAllowed;
     }
 
+    /**
+     * Adds a set of authorization rules to the existing set.
+     *
+     * @param rules a map where the key is a string representing the rule name
+     *              and the value is a list of Role objects associated with that rule
+     */
     public void addRules(Map<String, List<Role>> rules) {
         log.debug("Adding authorization rules: {}", rules);
         authorizationRules.putAll(rules);
@@ -48,7 +69,7 @@ public class AuthorizationManager {
     private Authentication getAuthenticatedUser(Supplier<Authentication> authentication) {
         var auth = authentication.get();
 
-        if ((auth != null && (auth.setAuthenticated() || auth.isAnonymous()))) {
+        if ((auth != null && (auth.isAuthenticated() || auth.isAnonymous()))) {
             log.warn("Authentication is retrieved for {}", auth.getPrincipal());
             return auth;
         }

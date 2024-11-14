@@ -29,6 +29,27 @@ import java.net.http.HttpClient;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Configuration class for the application context.
+ * <p>
+ * This class defines beans and settings related to various components such as validation,
+ * persistence, Redis, security, and services.
+ * <p>
+ * Utilizes various external configurations stored in environment variables or properties files.
+ * <p>
+ * Ensures proper initialization of key application components and services required for the
+ * application's operation.
+ * <p>
+ * The following beans are defined:
+ * - Validation and associated factories
+ * - EntityManagerFactory setup with Flyway
+ * - Redis connection pooling (JedisPool)
+ * - Various service beans including UserService, AuthenticationService, RegistrationService,
+ * VerificationService, EmailService, WeatherApiClient
+ * - Repositories for user management
+ * - Security components and utilities
+ * - Other utility beans like ObjectMapper and ModelMapper
+ */
 public class ApplicationContextConfiguration {
 
     private static final String DB_URL_ENV = "WEATHER_TRACKER_DB_URL";
